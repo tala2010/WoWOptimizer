@@ -1,0 +1,21 @@
+{
+  "assets/approved_hub_release_profile.json": "37f3891cab2c6c4578ae2af8b68a7354b5d58109a7b4044ed20b9f53f35d45ba",
+  "assets/RaidOptimizerBareRecorder/RaidOptimizerBareRecorder.lua": "03f178f00a9263b629d6429cba92d6ccbb2e61aa49edf787418378a48a590bea",
+  "assets/RaidOptimizerBareRecorder/RaidOptimizerBareRecorder.toc": "95bb63aeef71db232be27e110c8ad3d871859f4362410f3c0920d3c41143f3ea",
+  "assets/RaidOptimizerDetailsLabBridge/install_stamp.lua": "377d4a9509bcd66d6bb71d42ddc2678fce1757eb870bc409fcc43d5b09d9fe34",
+  "assets/RaidOptimizerDetailsLabBridge/RaidOptimizerDetailsLabBridge.lua": "a556a650b7a861b921549a188dd7f66aaf3dc089b2660bb2d7bc644bead3ca01",
+  "assets/RaidOptimizerDetailsLabBridge/RaidOptimizerDetailsLabBridge.toc": "0bcccae21371103c7266d15768fb30896c0e4c68e73e211ebaa848d6cd4fe0ba",
+  "assets/RaidOptimizerHub/ElvUIBridge.lua": "b8536bd9e6d3e5d7d60b6e2fade473709761ce264b5642090ccf23a96106e374",
+  "assets/RaidOptimizerHub/FrameProvider.lua": "bfa0daa85aa8fe71dd7e97314b5b9371d2b49a595c1ccbe55d70b33c07a4149f",
+  "assets/RaidOptimizerHub/install_stamp.lua": "062f8217d844995070eeb621e57339af81d3515dcee3e10d301d5f55c8a03efe",
+  "assets/RaidOptimizerHub/RaidOptimizerHub.lua": "fed571816be7b677f9826812227c643b95998d87661b5074fb26fe3791e6b775",
+  "assets/RaidOptimizerHub/RaidOptimizerHub.toc": "5701668a51ffe53a3186f3b17fc7b3aabd7f8252a05552b9237fc5b6aba57b90",
+  "assets/RaidOptimizerHub/runtime_config.lua": "8fa322aded2176760d5f26bee621d9af3320c5505ed24fbfec2589cc63049f4c",
+  "assets/RaidOptimizerHub/UnitDataProvider.lua": "3865aa4bd2bdcdab40ee15f3f1a07edc4e6916b4563c3cf6f697f5ed0f45a581",
+  "assets/RaidOptimizerNameplateAuraGuard/RaidOptimizerNameplateAuraGuard.lua": "5a3553b3d2449ffabd5f25716b937ff00c4f629b14f5acf7565dc245c26acd50",
+  "assets/RaidOptimizerNameplateAuraGuard/RaidOptimizerNameplateAuraGuard.toc": "ae392edf87b63fff5fca68e72bf841dbb4ecc8a854862620fa797f60ec312177",
+  "assets/RaidOptimizerStressTest/install_stamp.lua": "81bba81388a8e7370e6ddf4863565c058ae34e77ae277e2b9112482f1abbb1b3",
+  "assets/RaidOptimizerStressTest/NDuiRaidAuraProbe.lua": "c1f002ab3029ae71aadcb93bde82a9965f90bfee3a79f7811c418e5decbd41c9",
+  "assets/RaidOptimizerStressTest/RaidOptimizerStressTest.lua": "506e3c3bd42ec09eba043c39a135996970b6c27ac80956001db95028fea660cd",
+  "assets/RaidOptimizerStressTest/RaidOptimizerStressTest.toc": "610d1587cba73b8727cd058ad0dcfa06c98c60c8bf3dee6912b375cabae444f2"
+}

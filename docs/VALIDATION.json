@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-22",
+  "edition": "free open-source preview 0.1.0",
+  "python": "3.14.4",
+  "public_tests_passed": 7,
+  "checks": {
+    "public_tree_secret_patterns": "passed, no findings",
+    "python_syntax_and_imports": "passed",
+    "permanent_free_access_without_network": "passed",
+    "local_payload_tamper_rejection": "passed",
+    "unknown_addon_native_fallback": "passed",
+    "synthetic_install_repeat_restore": "passed",
+    "lua51_compilation": 13,
+    "r11_upstream_reconstruction_hashes": 10,
+    "gui_initialization": "passed, 486x730, free label visible",
+    "gui_visual_inspection": "passed using window-only capture",
+    "single_file_exe_build": "passed",
+    "exe_startup": "window found, alive after 4s",
+    "exe_startup_outbound_connections": 0,
+    "source_checkout_line_endings": "LF enforced; payload hashes regenerated"
+  },
+  "not_verified": [
+    "clean Windows machine",
+    "full game installation/restoration with this new free combination",
+    "real raid FPS/P99/stutter of free edition",
+    "R11 10% real-world FPS target",
+    "all optional legacy core methods"
+  ],
+  "distribution": {
+    "license": "GPL-2.0-only",
+    "private_history_included": false,
+    "windows_exe_sha256": "9cd2ad99cc1a67a35104edf1faab09cea1b1b959eea2db87b2e28441c0f95110"
+  },
+  "limits": [
+    "No-pattern findings is not proof of absence of every possible secret.",
+    "Historical R10/R11 performance does not validate the new free build."
+  ]
+}

@@ -1,0 +1,241 @@
+{
+  "snapshot_date": "2026-10-22",
+  "history": {
+    "earliest_prototype_date_from_internal_chronology": "2026-05-16",
+    "earliest_local_git_commit": "2026-05-28",
+    "calendar_elapsed_days_from_prototype_record": 159,
+    "not_a_work_hours_measure": true,
+    "documented_distinct_hub_version_labels": 43,
+    "hub_version_labels": [
+      "0.5.0",
+      "0.5.1",
+      "0.5.2",
+      "0.5.3",
+      "0.5.4",
+      "0.5.5",
+      "0.5.6",
+      "0.5.7",
+      "0.5.8",
+      "0.5.9",
+      "0.5.11",
+      "0.5.16",
+      "0.5.17",
+      "0.5.22",
+      "0.5.25",
+      "0.5.31",
+      "0.5.32",
+      "0.5.33",
+      "0.5.34",
+      "0.5.35",
+      "0.5.36",
+      "0.5.37",
+      "0.5.41",
+      "0.5.42",
+      "0.5.44",
+      "0.5.47",
+      "0.5.48",
+      "0.5.49",
+      "0.5.50",
+      "0.5.51",
+      "0.5.53",
+      "0.5.54",
+      "0.5.55",
+      "0.5.56",
+      "0.5.57",
+      "0.5.58",
+      "0.5.59",
+      "0.5.60",
+      "0.5.61",
+      "0.5.63",
+      "0.5.64",
+      "0.5.65",
+      "0.5.66"
+    ],
+    "scope_of_hub_count": "explicit literal labels in three internal historical documents; ranges not expanded; not all releases or successful versions",
+    "r1_r11_candidate_directories": 11,
+    "numbered_research_report_files": 283,
+    "history_sources": "internal chronology, status and progress records; private originals not included"
+  },
+  "source": {
+    "metric": "physical UTF-8 Python/Lua text lines, including comments and blank lines",
+    "application_tool_and_lua_files": 22,
+    "application_tool_and_lua_lines": 30216,
+    "python_non_test_lines": 19946,
+    "lua_lines": 10270,
+    "test_lines": 106,
+    "excludes": [
+      "third-party dependencies",
+      "license texts",
+      "R11 JSON patch data",
+      "private and deleted historical code"
+    ],
+    "not_claimed": [
+      "cumulative lines ever written",
+      "all lines original",
+      "human work hours"
+    ],
+    "files": [
+      {
+        "file": "assets/RaidOptimizerBareRecorder/RaidOptimizerBareRecorder.lua",
+        "language": "lua",
+        "physical_lines": 212,
+        "nonblank_lines": 196,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerDetailsLabBridge/install_stamp.lua",
+        "language": "lua",
+        "physical_lines": 1,
+        "nonblank_lines": 1,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerDetailsLabBridge/RaidOptimizerDetailsLabBridge.lua",
+        "language": "lua",
+        "physical_lines": 961,
+        "nonblank_lines": 903,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/ElvUIBridge.lua",
+        "language": "lua",
+        "physical_lines": 179,
+        "nonblank_lines": 160,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/FrameProvider.lua",
+        "language": "lua",
+        "physical_lines": 360,
+        "nonblank_lines": 331,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/install_stamp.lua",
+        "language": "lua",
+        "physical_lines": 1,
+        "nonblank_lines": 1,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/RaidOptimizerHub.lua",
+        "language": "lua",
+        "physical_lines": 2469,
+        "nonblank_lines": 2352,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/runtime_config.lua",
+        "language": "lua",
+        "physical_lines": 1,
+        "nonblank_lines": 1,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerHub/UnitDataProvider.lua",
+        "language": "lua",
+        "physical_lines": 1726,
+        "nonblank_lines": 1649,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerNameplateAuraGuard/RaidOptimizerNameplateAuraGuard.lua",
+        "language": "lua",
+        "physical_lines": 91,
+        "nonblank_lines": 81,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerStressTest/install_stamp.lua",
+        "language": "lua",
+        "physical_lines": 1,
+        "nonblank_lines": 1,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerStressTest/NDuiRaidAuraProbe.lua",
+        "language": "lua",
+        "physical_lines": 137,
+        "nonblank_lines": 127,
+        "test": false
+      },
+      {
+        "file": "assets/RaidOptimizerStressTest/RaidOptimizerStressTest.lua",
+        "language": "lua",
+        "physical_lines": 4131,
+        "nonblank_lines": 3948,
+        "test": false
+      },
+      {
+        "file": "free_access.py",
+        "language": "py",
+        "physical_lines": 26,
+        "nonblank_lines": 19,
+        "test": false
+      },
+      {
+        "file": "local_release.py",
+        "language": "py",
+        "physical_lines": 31,
+        "nonblank_lines": 27,
+        "test": false
+      },
+      {
+        "file": "main_gui.py",
+        "language": "py",
+        "physical_lines": 6290,
+        "nonblank_lines": 5725,
+        "test": false
+      },
+      {
+        "file": "optimizer_core.py",
+        "language": "py",
+        "physical_lines": 12360,
+        "nonblank_lines": 11477,
+        "test": false
+      },
+      {
+        "file": "research/r11/rebuild.py",
+        "language": "py",
+        "physical_lines": 48,
+        "nonblank_lines": 43,
+        "test": false
+      },
+      {
+        "file": "tests/test_public_release.py",
+        "language": "py",
+        "physical_lines": 106,
+        "nonblank_lines": 95,
+        "test": true
+      },
+      {
+        "file": "tools/__init__.py",
+        "language": "py",
+        "physical_lines": 0,
+        "nonblank_lines": 0,
+        "test": false
+      },
+      {
+        "file": "tools/apply_approved_hub_release.py",
+        "language": "py",
+        "physical_lines": 1118,
+        "nonblank_lines": 1034,
+        "test": false
+      },
+      {
+        "file": "tools/apply_hub_plugin_patches.py",
+        "language": "py",
+        "physical_lines": 7,
+        "nonblank_lines": 6,
+        "test": false
+      },
+      {
+        "file": "tools/verify_public_tree.py",
+        "language": "py",
+        "physical_lines": 66,
+        "nonblank_lines": 61,
+        "test": false
+      }
+    ]
+  }
+}

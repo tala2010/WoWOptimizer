@@ -1,0 +1,105 @@
+[
+  {
+    "name": "Pillow",
+    "version": "12.2.0",
+    "license_files": [
+      "third_party/licenses/Pillow/licenses/LICENSE"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "pystray",
+    "version": "0.19.5",
+    "license_files": [
+      "third_party/licenses/pystray/COPYING",
+      "third_party/licenses/pystray/COPYING.LGPL"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "six",
+    "version": "1.17.0",
+    "license_files": [
+      "third_party/licenses/six/LICENSE"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "numpy",
+    "version": "2.4.6",
+    "license_files": [
+      "third_party/licenses/numpy/licenses/LICENSE.txt",
+      "third_party/licenses/numpy/licenses/numpy/_core/include/numpy/libdivide/LICENSE.txt",
+      "third_party/licenses/numpy/licenses/numpy/_core/src/common/pythoncapi-compat/COPYING",
+      "third_party/licenses/numpy/licenses/numpy/_core/src/highway/LICENSE",
+      "third_party/licenses/numpy/licenses/numpy/_core/src/multiarray/dragon4_LICENSE.txt",
+      "third_party/licenses/numpy/licenses/numpy/_core/src/npysort/x86-simd-sort/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/_core/src/umath/svml/LICENSE",
+      "third_party/licenses/numpy/licenses/numpy/fft/pocketfft/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/linalg/lapack_lite/LICENSE.txt",
+      "third_party/licenses/numpy/licenses/numpy/ma/LICENSE",
+      "third_party/licenses/numpy/licenses/numpy/random/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/distributions/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/mt19937/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/pcg64/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/philox/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/sfc64/LICENSE.md",
+      "third_party/licenses/numpy/licenses/numpy/random/src/splitmix64/LICENSE.md"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "psutil",
+    "version": "7.2.2",
+    "license_files": [
+      "third_party/licenses/psutil/LICENSE"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "charset-normalizer",
+    "version": "3.4.7",
+    "license_files": [
+      "third_party/licenses/charset-normalizer/licenses/LICENSE"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "setuptools",
+    "version": "82.0.1",
+    "license_files": [
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/LICENSE",
+      "third_party/licenses/setuptools/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE.APACHE",
+      "third_party/licenses/setuptools/licenses/LICENSE.BSD",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE",
+      "third_party/licenses/setuptools/licenses/LICENSE.txt",
+      "third_party/licenses/setuptools/licenses/LICENSE"
+    ],
+    "runtime": true
+  },
+  {
+    "name": "pyinstaller",
+    "version": "6.21.0",
+    "license_files": [
+      "third_party/licenses/pyinstaller/licenses/COPYING.txt"
+    ],
+    "runtime": false
+  },
+  {
+    "name": "lupa",
+    "version": "2.8",
+    "license_files": [
+      "third_party/licenses/lupa/licenses/LICENSE.txt"
+    ],
+    "runtime": false
+  }
+]

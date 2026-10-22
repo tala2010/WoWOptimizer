@@ -1,0 +1,9 @@
+## Interface: 38001
+## Title: 团本优化大师 Details 安全适配
+## Notes: Native-safe low-frequency Details summary adapter; never replaces Details ranking.
+## Author: Raid Optimizer
+## Version: 0.6.3
+## OptionalDeps: Details, RaidOptimizerHub
+## SavedVariables: RaidOptimizerDetailsLabBridgeDB
+install_stamp.lua
+RaidOptimizerDetailsLabBridge.lua

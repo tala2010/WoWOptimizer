@@ -1,0 +1,9 @@
+## Interface: 11507, 38002
+## Title: 团本优化大师 流畅度诊断
+## Notes: 内部原生黑匣子：记录慢帧、Boss锚点、暴雪原生插件耗时和本地战斗日志。
+## Author: Raid Optimizer
+## Version: 0.10.10
+## SavedVariables: RaidOptimizerStressTestDB
+install_stamp.lua
+NDuiRaidAuraProbe.lua
+RaidOptimizerStressTest.lua

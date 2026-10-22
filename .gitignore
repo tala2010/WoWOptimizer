@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+build/
+dist/
+*.spec
+*.log
+*.zip
+.env*
+*.pem
+*.key
+*.seed
+settings.json
+backup/
+*.sqlite*

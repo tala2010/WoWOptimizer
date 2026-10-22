@@ -1,0 +1,3849 @@
+{
+  "components": {
+    "ndui": {
+      "addon": "NDui",
+      "files": []
+    },
+    "plater": {
+      "addon": "Plater",
+      "files": []
+    },
+    "weakauras": {
+      "addon": "WeakAuras",
+      "files": [
+        {
+          "approved_sha256": "9875845edfec14b76a738e1c0d74c404bfbc6de7fefe95f8555184b89d195c62",
+          "base_approved_sha256": "974970fe33e840804a386ea4b38fe7e63009ac9be89fae30231a4aadc4d530fd",
+          "clean_sha256": "373d49b1b6fb34f8ca24c5828fd4e42fdb849c23f5e92cb477e0a9a4cab73aaa",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20",
+                "local function RaidOptimizerHubCombatLogInfo()",
+                "  if RaidOptimizerHub",
+                "    and type(RaidOptimizerHub.HasCurrentCombatLogEvent) == \"function\"",
+                "    and RaidOptimizerHub.HasCurrentCombatLogEvent()",
+                "    and type(RaidOptimizerHub.GetCurrentCombatLogEvent) == \"function\"",
+                "  then",
+                "    return RaidOptimizerHub.GetCurrentCombatLogEvent()",
+                "  end",
+                "  return CombatLogGetCurrentEventInfo()",
+                "end",
+                "",
+                "local function RaidOptimizerHubCombatLogSubevent()",
+                "  if RaidOptimizerHub",
+                "    and type(RaidOptimizerHub.HasCurrentCombatLogEvent) == \"function\"",
+                "    and RaidOptimizerHub.HasCurrentCombatLogEvent()",
+                "    and type(RaidOptimizerHub.GetCurrentCombatLogSubevent) == \"function\"",
+                "  then",
+                "    return RaidOptimizerHub.GetCurrentCombatLogSubevent()",
+                "  end",
+                "  local _, subevent = CombatLogGetCurrentEventInfo()",
+                "  return subevent",
+                "end",
+                ""
+              ]
+            ],
+            [
+              73,
+              73,
+              [
+                "local function RaidOptimizerHubCollectSpellIds(result, value)",
+                "  if type(value) == \"number\" then",
+                "    result[value] = true",
+                "    return true",
+                "  end",
+                "  if type(value) == \"string\" then",
+                "    local added = false",
+                "    for token in value:gmatch(\"%d+\") do",
+                "      result[tonumber(token)] = true",
+                "      added = true",
+                "    end",
+                "    return added",
+                "  end",
+                "  if type(value) == \"table\" then",
+                "    local added = false",
+                "    for _, item in pairs(value) do",
+                "      if RaidOptimizerHubCollectSpellIds(result, item) then added = true end",
+                "    end",
+                "    return added",
+                "  end",
+                "  return false",
+                "end",
+                "",
+                "local function RaidOptimizerHubBuildSpellIdFilter(trigger, prototype)",
+                "  if not prototype or not trigger or trigger.event ~= \"Combat Log\"",
+                "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\"",
+                "  then",
+                "    return nil",
+                "  end",
+                "  -- WeakAuras only enables the Combat Log spellId field for payloads that",
+                "  -- actually carry a spell ID in this position. SavedVariables can retain a",
+                "  -- stale use_spellId flag after a trigger changes to UNIT_DIED or SWING; using",
+                "  -- that stale flag here would suppress a trigger that native WA still runs.",
+                "  local prefix = trigger.subeventPrefix",
+                "  local spellIdEnabled = type(prefix) == \"string\" and (",
+                "    prefix:find(\"SPELL\", 1, true)",
+                "    or prefix == \"RANGE\"",
+                "    or prefix:find(\"DAMAGE\", 1, true)",
+                "  )",
+                "  if not spellIdEnabled then return nil end",
+                "  local result = {}",
+                "  if RaidOptimizerHubCollectSpellIds(result, trigger.spellId) then return result end",
+                "  return nil",
+                "end",
+                "",
+                "local function RaidOptimizerHubSyncWeakAurasDemands()",
+                "  if not RaidOptimizerHub or type(RaidOptimizerHub.SetDemandSnapshot) ~= \"function\" then return end",
+                "  local active = {}",
+                "  local cleu = loaded_events[\"COMBAT_LOG_EVENT_UNFILTERED\"]",
+                "  for subevent, consumers in pairs(cleu or {}) do",
+                "    local broad = false",
+                "    local exact = {}",
+                "    for _, triggers in pairs(consumers or {}) do",
+                "      for _, data in pairs(triggers or {}) do",
+                "        if data and data.raidOptimizerSpellIds and subevent ~= \"SPELL_ABSORBED\" then",
+                "          for spellId in pairs(data.raidOptimizerSpellIds) do",
+                "            exact[subevent .. \":\" .. tostring(spellId)] = true",
+                "          end",
+                "        else",
+                "          broad = true",
+                "        end",
+                "      end",
+                "    end",
+                "    if broad then",
+                "      active[subevent] = true",
+                "    else",
+                "      for key in pairs(exact) do active[key] = true end",
+                "    end",
+                "  end",
+                "  RaidOptimizerHub.SetDemandSnapshot(\"WeakAuras:GenericTrigger\", \"wa.cleu\", active)",
+                "end"
+              ]
+            ],
+            [
+              901,
+              902,
+              [
+                "    local arg2 = RaidOptimizerHubCombatLogSubevent();"
+              ]
+            ],
+            [
+              908,
+              909,
+              [
+                "    Private.ScanEventsInternal(event_list, event, RaidOptimizerHubCombatLogInfo());"
+              ]
+            ],
+            [
+              988,
+              988,
+              [
+                "  local raidOptimizerSpellId = event == \"COMBAT_LOG_EVENT_UNFILTERED\" and select(10, ...) or nil"
+              ]
+            ],
+            [
+              993,
+              993,
+              [
+                "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+              ]
+            ],
+            [
+              1010,
+              1010,
+              [
+                "      end"
+              ]
+            ],
+            [
+              1534,
+              1535,
+              [
+                "    if event == \"COMBAT_LOG_EVENT_UNFILTERED\"",
+                "      and RaidOptimizerHub",
+                "      and type(RaidOptimizerHub.BindCombatLogFrame) == \"function\"",
+                "    then",
+                "      RaidOptimizerHub.BindCombatLogFrame(\"WeakAuras:GenericTrigger\", frame, {",
+                "        filterName = \"active WA CLEU subevents\",",
+                "        combatDemandCategory = \"wa.cleu\",",
+                "        filter = function(_, subevent, _, _, _, _, _, _, _, _, _, spellId)",
+                "          if RaidOptimizerHub and type(RaidOptimizerHub.HasCombatLogDemand) == \"function\" then",
+                "            local wanted = RaidOptimizerHub.HasCombatLogDemand(\"wa.cleu\", subevent, spellId)",
+                "            if wanted ~= nil then return wanted end",
+                "          end",
+                "          local cleu = loaded_events[\"COMBAT_LOG_EVENT_UNFILTERED\"]",
+                "          return cleu ~= nil and cleu[subevent] ~= nil",
+                "        end,",
+                "      })",
+                "    else",
+                "      xpcall(frame.RegisterEvent, trueFunction, frame, event)",
+                "    end"
+              ]
+            ],
+            [
+              1569,
+              1569,
+              [
+                "  RaidOptimizerHubWeakAurasBatchGeneration = (RaidOptimizerHubWeakAurasBatchGeneration or 0) + 1",
+                "  RaidOptimizerHubSyncWeakAurasDemands()"
+              ]
+            ],
+            [
+              1911,
+              1911,
+              [
+                "          raidOptimizerSpellIds = RaidOptimizerHubBuildSpellIdFilter(trigger, prototype),"
+              ]
+            ],
+            [
+              2239,
+              2240,
+              [
+                "      if RaidOptimizerHub and type(RaidOptimizerHub.BindCombatLogFrame) == \"function\" then",
+                "        RaidOptimizerHub.BindCombatLogFrame(\"WeakAuras:GenericTrigger.lua:swingTimerFrame\", swingTimerFrame)",
+                "      else",
+                "        swingTimerFrame:RegisterEvent(\"COMBAT_LOG_EVENT_UNFILTERED\")",
+                "      end"
+              ]
+            ],
+            [
+              2253,
+              2254,
+              [
+                "            swingTimerCLEUCheck(RaidOptimizerHubCombatLogInfo())"
+              ]
+            ]
+          ],
+          "path": "GenericTrigger.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              0,
+              24,
+              []
+            ],
+            [
+              97,
+              168,
+              []
+            ],
+            [
+              996,
+              997,
+              [
+                "    local arg1, arg2 = CombatLogGetCurrentEventInfo();"
+              ]
+            ],
+            [
+              1003,
+              1004,
+              [
+                "    Private.ScanEventsInternal(event_list, event, CombatLogGetCurrentEventInfo());"
+              ]
+            ],
+            [
+              1083,
+              1084,
+              []
+            ],
+            [
+              1089,
+              1090,
+              []
+            ],
+            [
+              1107,
+              1108,
+              []
+            ],
+            [
+              1632,
+              1651,
+              [
+                "    xpcall(frame.RegisterEvent, trueFunction, frame, event)"
+              ]
+            ],
+            [
+              1685,
+              1687,
+              []
+            ],
+            [
+              2029,
+              2030,
+              []
+            ],
+            [
+              2358,
+              2363,
+              [
+                "      swingTimerFrame:RegisterEvent(\"COMBAT_LOG_EVENT_UNFILTERED\");"
+              ]
+            ],
+            [
+              2376,
+              2377,
+              [
+                "            swingTimerCLEUCheck(CombatLogGetCurrentEventInfo())"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "974970fe33e840804a386ea4b38fe7e63009ac9be89fae30231a4aadc4d530fd"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  741,
+                  791,
+                  []
+                ],
+                [
+                  804,
+                  805,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  806,
+                  807,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  832,
+                  833,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  834,
+                  835,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  863,
+                  864,
+                  [
+                    "          ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, data.counter, event, unitForUnitTrigger, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  865,
+                  866,
+                  [
+                    "          ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, event, unitForUnitTrigger, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  885,
+                  886,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  887,
+                  888,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  907,
+                  908,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  909,
+                  910,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, event, arg1, arg2, ...);"
+                  ]
+                ]
+              ],
+              "source_sha256": "30d30d69f6045ebf18170c3f473bd01abfcb41a9d1145a62dc0f696b27f20987",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  126,
+                  126,
+                  [
+                    "  -- WeakAuras only enables the Combat Log spellId field for payloads that",
+                    "  -- actually carry a spell ID in this position. SavedVariables can retain a",
+                    "  -- stale use_spellId flag after a trigger changes to UNIT_DIED or SWING; using",
+                    "  -- that stale flag here would suppress a trigger that native WA still runs.",
+                    "  local prefix = trigger.subeventPrefix",
+                    "  local spellIdEnabled = type(prefix) == \"string\" and (",
+                    "    prefix:find(\"SPELL\", 1, true)",
+                    "    or prefix == \"RANGE\"",
+                    "    or prefix:find(\"DAMAGE\", 1, true)",
+                    "  )",
+                    "  if not spellIdEnabled then return nil end"
+                  ]
+                ],
+                [
+                  1009,
+                  1189,
+                  []
+                ],
+                [
+                  1196,
+                  1198,
+                  []
+                ],
+                [
+                  1226,
+                  1227,
+                  []
+                ],
+                [
+                  1255,
+                  1257,
+                  []
+                ],
+                [
+                  1290,
+                  1291,
+                  []
+                ]
+              ],
+              "source_sha256": "38ad31a06cbe3433622f29649e0bb10275c9584c8a22dbef58c0f23050d8d6b8",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  1118,
+                  1130,
+                  []
+                ],
+                [
+                  1340,
+                  1346,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ]
+              ],
+              "source_sha256": "cfa9ea1f0326a1749aa9fe77f8e76fd3e75f81099d14f56cc57bef268eeef934",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  122,
+                  124,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  169,
+                  265,
+                  []
+                ],
+                [
+                  838,
+                  888,
+                  []
+                ],
+                [
+                  901,
+                  902,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  903,
+                  904,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  929,
+                  930,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  931,
+                  932,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, allStates, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  960,
+                  961,
+                  [
+                    "          ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, data.counter, event, unitForUnitTrigger, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  962,
+                  963,
+                  [
+                    "          ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, event, unitForUnitTrigger, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  982,
+                  983,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  984,
+                  985,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, state, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  1004,
+                  1005,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, data.counter, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  1006,
+                  1007,
+                  [
+                    "        ok, returnValue = xpcall(data.triggerFunc, errorHandler, event, arg1, arg2, ...);"
+                  ]
+                ],
+                [
+                  1094,
+                  1095,
+                  []
+                ],
+                [
+                  1097,
+                  1110,
+                  []
+                ],
+                [
+                  1113,
+                  1121,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1123,
+                  1131,
+                  []
+                ],
+                [
+                  1132,
+                  1133,
+                  []
+                ],
+                [
+                  1142,
+                  1166,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1168,
+                  1169,
+                  []
+                ],
+                [
+                  1285,
+                  1300,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1304,
+                  1305,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1332,
+                  1344,
+                  []
+                ],
+                [
+                  1555,
+                  1561,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ]
+              ],
+              "source_sha256": "d401cf062b1cb7715642f4ed02206c6abf783f332e6f49aa9067e24e504d20dc",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  122,
+                  124,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  169,
+                  265,
+                  []
+                ],
+                [
+                  1044,
+                  1045,
+                  []
+                ],
+                [
+                  1047,
+                  1060,
+                  []
+                ],
+                [
+                  1063,
+                  1071,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1073,
+                  1081,
+                  []
+                ],
+                [
+                  1082,
+                  1083,
+                  []
+                ],
+                [
+                  1092,
+                  1116,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1118,
+                  1119,
+                  []
+                ],
+                [
+                  1235,
+                  1250,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1254,
+                  1255,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1282,
+                  1294,
+                  []
+                ],
+                [
+                  1505,
+                  1511,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ]
+              ],
+              "source_sha256": "6989789501734bacff4f2f060cde5b69bee92c726b345e2988f412299608a4e8",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  122,
+                  124,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  169,
+                  285,
+                  []
+                ],
+                [
+                  1064,
+                  1065,
+                  []
+                ],
+                [
+                  1067,
+                  1080,
+                  []
+                ],
+                [
+                  1083,
+                  1091,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1093,
+                  1101,
+                  []
+                ],
+                [
+                  1102,
+                  1103,
+                  []
+                ],
+                [
+                  1112,
+                  1136,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1138,
+                  1139,
+                  []
+                ],
+                [
+                  1255,
+                  1274,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1277,
+                  1297,
+                  []
+                ],
+                [
+                  1298,
+                  1299,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1319,
+                  1324,
+                  []
+                ],
+                [
+                  1331,
+                  1343,
+                  []
+                ],
+                [
+                  1554,
+                  1560,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ]
+              ],
+              "source_sha256": "3b66a19d600c648d17a6fc106b3b6c8cac189134851fd9222a038ded5ce56317",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  122,
+                  124,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  141,
+                  151,
+                  []
+                ],
+                [
+                  179,
+                  352,
+                  []
+                ],
+                [
+                  1131,
+                  1132,
+                  []
+                ],
+                [
+                  1134,
+                  1147,
+                  []
+                ],
+                [
+                  1150,
+                  1158,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1160,
+                  1168,
+                  []
+                ],
+                [
+                  1169,
+                  1170,
+                  []
+                ],
+                [
+                  1179,
+                  1203,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1205,
+                  1206,
+                  []
+                ],
+                [
+                  1322,
+                  1342,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1345,
+                  1365,
+                  []
+                ],
+                [
+                  1366,
+                  1367,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1387,
+                  1392,
+                  []
+                ],
+                [
+                  1399,
+                  1411,
+                  []
+                ],
+                [
+                  1622,
+                  1628,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ],
+                [
+                  2329,
+                  2330,
+                  []
+                ]
+              ],
+              "source_sha256": "483dc3fc0c6ac44d812d0a7b02d1707792cbd1082de4379f8d9e58ef790e2e27",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  97,
+                  99,
+                  []
+                ],
+                [
+                  124,
+                  126,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  145,
+                  201,
+                  []
+                ],
+                [
+                  205,
+                  206,
+                  []
+                ],
+                [
+                  207,
+                  208,
+                  []
+                ],
+                [
+                  212,
+                  213,
+                  []
+                ],
+                [
+                  216,
+                  217,
+                  []
+                ],
+                [
+                  218,
+                  226,
+                  [
+                    "        else"
+                  ]
+                ],
+                [
+                  237,
+                  240,
+                  []
+                ],
+                [
+                  241,
+                  434,
+                  []
+                ],
+                [
+                  1213,
+                  1214,
+                  []
+                ],
+                [
+                  1216,
+                  1229,
+                  []
+                ],
+                [
+                  1232,
+                  1240,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1242,
+                  1250,
+                  []
+                ],
+                [
+                  1251,
+                  1252,
+                  []
+                ],
+                [
+                  1261,
+                  1285,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1287,
+                  1288,
+                  []
+                ],
+                [
+                  1404,
+                  1426,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1429,
+                  1451,
+                  []
+                ],
+                [
+                  1452,
+                  1456,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1476,
+                  1481,
+                  []
+                ],
+                [
+                  1488,
+                  1500,
+                  []
+                ],
+                [
+                  1711,
+                  1717,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ],
+                [
+                  2026,
+                  2027,
+                  []
+                ],
+                [
+                  2028,
+                  2029,
+                  [
+                    "        filter = function(_, subevent, _, _, _, _, _, _, _, _, _, spellId)"
+                  ]
+                ],
+                [
+                  2030,
+                  2032,
+                  [
+                    "            local wanted = RaidOptimizerHub.HasCombatLogDemand(\"wa.cleu\", subevent, spellId)"
+                  ]
+                ],
+                [
+                  2420,
+                  2422,
+                  []
+                ]
+              ],
+              "source_sha256": "8aa53d88945d56e39625cf644ce6488a380e844a0fb7e55b1ac226185151f6eb",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  97,
+                  99,
+                  []
+                ],
+                [
+                  124,
+                  126,
+                  [
+                    "    or trigger.use_spellId ~= true or trigger.subeventSuffix == \"_ABSORBED\""
+                  ]
+                ],
+                [
+                  145,
+                  256,
+                  []
+                ],
+                [
+                  260,
+                  261,
+                  []
+                ],
+                [
+                  262,
+                  263,
+                  []
+                ],
+                [
+                  267,
+                  268,
+                  []
+                ],
+                [
+                  271,
+                  272,
+                  []
+                ],
+                [
+                  273,
+                  281,
+                  [
+                    "        else"
+                  ]
+                ],
+                [
+                  292,
+                  295,
+                  []
+                ],
+                [
+                  296,
+                  504,
+                  []
+                ],
+                [
+                  1283,
+                  1284,
+                  []
+                ],
+                [
+                  1286,
+                  1299,
+                  []
+                ],
+                [
+                  1302,
+                  1310,
+                  [
+                    "  self.queue = {}"
+                  ]
+                ],
+                [
+                  1312,
+                  1320,
+                  []
+                ],
+                [
+                  1321,
+                  1322,
+                  []
+                ],
+                [
+                  1331,
+                  1355,
+                  [
+                    "  tinsert(self.queue, {func = func, args = {...}})"
+                  ]
+                ],
+                [
+                  1357,
+                  1358,
+                  []
+                ],
+                [
+                  1474,
+                  1497,
+                  [
+                    "  for id, triggers in pairs(event_list) do"
+                  ]
+                ],
+                [
+                  1500,
+                  1523,
+                  []
+                ],
+                [
+                  1524,
+                  1529,
+                  [
+                    "      if not data.raidOptimizerSpellIds or data.raidOptimizerSpellIds[raidOptimizerSpellId] then"
+                  ]
+                ],
+                [
+                  1549,
+                  1554,
+                  []
+                ],
+                [
+                  1561,
+                  1573,
+                  []
+                ],
+                [
+                  1784,
+                  1790,
+                  [
+                    "      Private.ScanEvents(event);"
+                  ]
+                ],
+                [
+                  2099,
+                  2100,
+                  []
+                ],
+                [
+                  2101,
+                  2102,
+                  [
+                    "        filter = function(_, subevent, _, _, _, _, _, _, _, _, _, spellId)"
+                  ]
+                ],
+                [
+                  2103,
+                  2105,
+                  [
+                    "            local wanted = RaidOptimizerHub.HasCombatLogDemand(\"wa.cleu\", subevent, spellId)"
+                  ]
+                ],
+                [
+                  2493,
+                  2496,
+                  []
+                ]
+              ],
+              "source_sha256": "736f3d607c187d5a3f82c8fefd5b08631c550415d2404de54a2da5a278a6d34d",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "3d46242ecb854c5cbc8bd2aa0bfd4b33610ba11b3678ac4c8511cbd3b474ec77",
+          "base_approved_sha256": "910cd0dd3715b8b9fb069904066494bf8dbd5b27ff90e65cc1fdfcb47b880e1f",
+          "clean_sha256": "d1c3f1148dac29fb620238f38499c6dd8ba97179bd2bf791faddaeaa64c25776",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              2064,
+              2064,
+              [
+                "      -- RaidOptimizerHub VF APL registration adapter",
+                "      if RaidOptimizerHub",
+                "        and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                "      then",
+                "        local vfEnvironment",
+                "        if type(Private.GetRaidOptimizerCustomEnvironment) == \"function\" then",
+                "          vfEnvironment = Private.GetRaidOptimizerCustomEnvironment()",
+                "        elseif type(getfenv) == \"function\" then",
+                "          vfEnvironment = getfenv(func)",
+                "        end",
+                "        if type(vfEnvironment) == \"table\" then",
+                "          pcall(RaidOptimizerHub.PrepareVFRegistration, vfEnvironment, id)",
+                "        end",
+                "      end"
+              ]
+            ]
+          ],
+          "path": "WeakAuras.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              77,
+              78,
+              [
+                "local LGF = (LibStub(\"RaidOptimizerHub-WeakAuras-LibGetFrame-1.0\", true) or LibStub(\"LibGetFrame-1.0\"))"
+              ]
+            ],
+            [
+              2042,
+              2042,
+              [
+                "  -- RaidOptimizerHub loaded-display inventory",
+                "  if RaidOptimizerHub",
+                "    and type(RaidOptimizerHub.RecordWeakAurasLoadChanges) == \"function\"",
+                "  then",
+                "    pcall(RaidOptimizerHub.RecordWeakAurasLoadChanges, toLoad, true)",
+                "  end"
+              ]
+            ],
+            [
+              2086,
+              2086,
+              [
+                "  -- RaidOptimizerHub loaded-display inventory",
+                "  if RaidOptimizerHub",
+                "    and type(RaidOptimizerHub.RecordWeakAurasLoadChanges) == \"function\"",
+                "  then",
+                "    pcall(RaidOptimizerHub.RecordWeakAurasLoadChanges, toUnload, false)",
+                "  end"
+              ]
+            ],
+            [
+              3752,
+              3753,
+              [
+                "            new_frame = LGF.GetUnitFrame(unit)"
+              ]
+            ],
+            [
+              3783,
+              3784,
+              [
+                "            new_frame = LGF.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+              ]
+            ],
+            [
+              3797,
+              3798,
+              [
+                "          new_frame = LGF.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+              ]
+            ],
+            [
+              3842,
+              3843,
+              [
+                "      glow_frame = LGF.GetUnitFrame(region.state.unit)"
+              ]
+            ],
+            [
+              6128,
+              6129,
+              [
+                "      local frame = LGF.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+              ]
+            ],
+            [
+              6772,
+              6772,
+              [
+                "if type(LGF.RaidOptimizerRegisterBinding) == \"function\" then",
+                "  LGF:RaidOptimizerRegisterBinding(\"core\", \"wa-5.21.8-lgf74-private2\")",
+                "end"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "910cd0dd3715b8b9fb069904066494bf8dbd5b27ff90e65cc1fdfcb47b880e1f",
+            "af741696dbebadd78ba1731d9bb1802a7400671f372071f206ecb0c1e094f665"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  2068,
+                  2069,
+                  []
+                ],
+                [
+                  2070,
+                  2071,
+                  [
+                    "        local vfEnvironment",
+                    "        if type(Private.GetRaidOptimizerCustomEnvironment) == \"function\" then",
+                    "          vfEnvironment = Private.GetRaidOptimizerCustomEnvironment()",
+                    "        elseif type(getfenv) == \"function\" then",
+                    "          vfEnvironment = getfenv(func)",
+                    "        end",
+                    "        if type(vfEnvironment) == \"table\" then",
+                    "          pcall(RaidOptimizerHub.PrepareVFRegistration, vfEnvironment, id)",
+                    "        end"
+                  ]
+                ]
+              ],
+              "source_sha256": "bad283f5e67cc28f05c595c9357f56e751e21ce1284f10ae34b8f82a5950b707",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  0,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  76,
+                  77,
+                  [
+                    "local LGF = LibStub(\"LibGetFrame-1.0\")"
+                  ]
+                ],
+                [
+                  2064,
+                  2064,
+                  [
+                    "      -- RaidOptimizerHub VF APL registration adapter",
+                    "      if RaidOptimizerHub",
+                    "        and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                    "      then",
+                    "        local vfEnvironment",
+                    "        if type(Private.GetRaidOptimizerCustomEnvironment) == \"function\" then",
+                    "          vfEnvironment = Private.GetRaidOptimizerCustomEnvironment()",
+                    "        elseif type(getfenv) == \"function\" then",
+                    "          vfEnvironment = getfenv(func)",
+                    "        end",
+                    "        if type(vfEnvironment) == \"table\" then",
+                    "          pcall(RaidOptimizerHub.PrepareVFRegistration, vfEnvironment, id)",
+                    "        end",
+                    "      end"
+                  ]
+                ],
+                [
+                  3737,
+                  3738,
+                  [
+                    "            new_frame = WeakAuras.GetUnitFrame(unit)"
+                  ]
+                ],
+                [
+                  3768,
+                  3769,
+                  [
+                    "            new_frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+                  ]
+                ],
+                [
+                  3782,
+                  3783,
+                  [
+                    "          new_frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+                  ]
+                ],
+                [
+                  3827,
+                  3828,
+                  [
+                    "      glow_frame = WeakAuras.GetUnitFrame(region.state.unit)"
+                  ]
+                ],
+                [
+                  6113,
+                  6114,
+                  [
+                    "      local frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+                  ]
+                ],
+                [
+                  6757,
+                  6760,
+                  []
+                ]
+              ],
+              "source_sha256": "12b8806c4b3c8d3b355aa6ed157a7e941a58f2709883b0f0098839a7c0c138db",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  2042,
+                  2048,
+                  []
+                ],
+                [
+                  2092,
+                  2098,
+                  []
+                ]
+              ],
+              "source_sha256": "ed7740f8826da486e376e15c819c17405fc2fd3b3889c10be16115d1088f2885",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "3ecbb2af2d7134c94cf0279a986f04942298bfbbec7b6a9e553aa3dd56f08d20",
+          "base_approved_sha256": "d06ff8096f69611c066b98eac6f2dd5f199a53b21aa52e546127d633f227930b",
+          "clean_sha256": "c108cc74d5542b69e0d5b3c4ab6d116da74f08090155f723365f626d57476c83",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              616,
+              616,
+              [
+                "    -- RaidOptimizerHub VF shared-global assignment bridge",
+                "    if (key == \"VF_Common\" or key == \"VF_registerAPL\"",
+                "      or key == \"VF_getSpellCD\" or key == \"VF_getItemCD\"",
+                "      or key == \"VF_getBuff\" or key == \"VF_getDebuff\")",
+                "      and RaidOptimizerHub",
+                "      and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                "    then",
+                "      local auraId = current_aura_env and current_aura_env.id",
+                "      if auraId then",
+                "        pcall(RaidOptimizerHub.PrepareVFRegistration, table, auraId)",
+                "      end",
+                "    end"
+              ]
+            ],
+            [
+              619,
+              619,
+              [
+                "",
+                "-- RaidOptimizerHub VF custom execution environment bridge",
+                "function Private.GetRaidOptimizerCustomEnvironment()",
+                "  return exec_env_custom",
+                "end"
+              ]
+            ]
+          ],
+          "path": "AuraEnvironment.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              0,
+              1,
+              []
+            ],
+            [
+              617,
+              629,
+              []
+            ],
+            [
+              632,
+              637,
+              []
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "d06ff8096f69611c066b98eac6f2dd5f199a53b21aa52e546127d633f227930b"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  617,
+                  617,
+                  [
+                    "    -- RaidOptimizerHub VF shared-global assignment bridge",
+                    "    if (key == \"VF_Common\" or key == \"VF_registerAPL\"",
+                    "      or key == \"VF_getSpellCD\" or key == \"VF_getItemCD\"",
+                    "      or key == \"VF_getBuff\" or key == \"VF_getDebuff\")",
+                    "      and RaidOptimizerHub",
+                    "      and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                    "    then",
+                    "      local auraId = current_aura_env and current_aura_env.id",
+                    "      if auraId then",
+                    "        pcall(RaidOptimizerHub.PrepareVFRegistration, table, auraId)",
+                    "      end",
+                    "    end"
+                  ]
+                ]
+              ],
+              "source_sha256": "f6d5f96bb5425153d0e3227c792bf26323cfbbfc5e3798287331e61c1cc82b63",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  28,
+                  45,
+                  []
+                ],
+                [
+                  49,
+                  60,
+                  []
+                ],
+                [
+                  645,
+                  645,
+                  [
+                    "    -- RaidOptimizerHub VF shared-global assignment bridge",
+                    "    if (key == \"VF_Common\" or key == \"VF_registerAPL\"",
+                    "      or key == \"VF_getSpellCD\" or key == \"VF_getItemCD\"",
+                    "      or key == \"VF_getBuff\" or key == \"VF_getDebuff\")",
+                    "      and RaidOptimizerHub",
+                    "      and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                    "    then",
+                    "      local auraId = current_aura_env and current_aura_env.id",
+                    "      if auraId then",
+                    "        pcall(RaidOptimizerHub.PrepareVFRegistration, table, auraId)",
+                    "      end",
+                    "    end"
+                  ]
+                ],
+                [
+                  648,
+                  648,
+                  [
+                    "",
+                    "-- RaidOptimizerHub VF custom execution environment bridge",
+                    "function Private.GetRaidOptimizerCustomEnvironment()",
+                    "  return exec_env_custom",
+                    "end"
+                  ]
+                ]
+              ],
+              "source_sha256": "7f7fc20d988132c82a5d1807b3c0331ead1b2d1394e27a860c7f438e13e24c09",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  28,
+                  45,
+                  []
+                ],
+                [
+                  49,
+                  60,
+                  []
+                ],
+                [
+                  186,
+                  187,
+                  [
+                    "local LGF = LibStub(\"LibGetFrame-1.0\")"
+                  ]
+                ],
+                [
+                  533,
+                  535,
+                  []
+                ],
+                [
+                  647,
+                  647,
+                  [
+                    "    -- RaidOptimizerHub VF shared-global assignment bridge",
+                    "    if (key == \"VF_Common\" or key == \"VF_registerAPL\"",
+                    "      or key == \"VF_getSpellCD\" or key == \"VF_getItemCD\"",
+                    "      or key == \"VF_getBuff\" or key == \"VF_getDebuff\")",
+                    "      and RaidOptimizerHub",
+                    "      and type(RaidOptimizerHub.PrepareVFRegistration) == \"function\"",
+                    "    then",
+                    "      local auraId = current_aura_env and current_aura_env.id",
+                    "      if auraId then",
+                    "        pcall(RaidOptimizerHub.PrepareVFRegistration, table, auraId)",
+                    "      end",
+                    "    end"
+                  ]
+                ],
+                [
+                  650,
+                  650,
+                  [
+                    "",
+                    "-- RaidOptimizerHub VF custom execution environment bridge",
+                    "function Private.GetRaidOptimizerCustomEnvironment()",
+                    "  return exec_env_custom",
+                    "end"
+                  ]
+                ],
+                [
+                  751,
+                  755,
+                  []
+                ]
+              ],
+              "source_sha256": "cc3724fcad93a80f187e047d3e7ba2b473e7181cfb7b1c210bbeda33bb2da354",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  319,
+                  333,
+                  []
+                ],
+                [
+                  414,
+                  417,
+                  []
+                ],
+                [
+                  418,
+                  419,
+                  []
+                ]
+              ],
+              "source_sha256": "44bf42d577520d0d4d794517ab41ac5ad12c8fcc86a9d68e12ba7695f93b28b2",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  158,
+                  159,
+                  [
+                    "local LGF = LibStub(\"LibGetFrame-1.0\")"
+                  ]
+                ],
+                [
+                  319,
+                  448,
+                  []
+                ],
+                [
+                  529,
+                  535,
+                  [
+                    "          xpcall(func, Private.GetErrorHandlerId(id, \"init\"))"
+                  ]
+                ],
+                [
+                  639,
+                  641,
+                  []
+                ],
+                [
+                  874,
+                  878,
+                  []
+                ]
+              ],
+              "source_sha256": "d052520706ef37dce59a91fb278f54e8c80aafebdc74a3fa91027d7fc3598fc6",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  158,
+                  159,
+                  [
+                    "local LGF = LibStub(\"LibGetFrame-1.0\")"
+                  ]
+                ],
+                [
+                  319,
+                  490,
+                  []
+                ],
+                [
+                  571,
+                  577,
+                  [
+                    "          xpcall(func, Private.GetErrorHandlerId(id, \"init\"))"
+                  ]
+                ],
+                [
+                  681,
+                  683,
+                  []
+                ],
+                [
+                  916,
+                  920,
+                  []
+                ]
+              ],
+              "source_sha256": "ed6a517a5949e5e5e4332048968800822f8de8fa3f9ef3f397d603aaf1057b52",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  158,
+                  159,
+                  [
+                    "local LGF = LibStub(\"LibGetFrame-1.0\")"
+                  ]
+                ],
+                [
+                  319,
+                  496,
+                  []
+                ],
+                [
+                  577,
+                  583,
+                  [
+                    "          xpcall(func, Private.GetErrorHandlerId(id, \"init\"))"
+                  ]
+                ],
+                [
+                  687,
+                  689,
+                  []
+                ],
+                [
+                  922,
+                  926,
+                  []
+                ]
+              ],
+              "source_sha256": "5dbee004907040fdbbd8050a00e11bd4f467d1ee27395742e545921b1e06b4d1",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "de92eb0ae4f035e064b44293563fe77a1db820fbebc85cb9199e1e2ff8a1ee10",
+          "base_approved_sha256": "862e82b2781e4917a180388106c569d45d35768aef5e73c8ac50d29b03de638e",
+          "clean_sha256": "efd587fb4bd50a5d889a9de5c6d0903330376aa71d45bba6f227a732651efae3",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20",
+                "local function RaidOptimizerHubCombatLogInfo()",
+                "  if RaidOptimizerHub",
+                "    and type(RaidOptimizerHub.HasCurrentCombatLogEvent) == \"function\"",
+                "    and RaidOptimizerHub.HasCurrentCombatLogEvent()",
+                "    and type(RaidOptimizerHub.GetCurrentCombatLogEvent) == \"function\"",
+                "  then",
+                "    return RaidOptimizerHub.GetCurrentCombatLogEvent()",
+                "  end",
+                "  return CombatLogGetCurrentEventInfo()",
+                "end",
+                ""
+              ]
+            ],
+            [
+              1994,
+              1995,
+              []
+            ],
+            [
+              2368,
+              2370,
+              [
+                "-- RaidOptimizerHub coalesced native WA aura events",
+                "local raidOptimizerHubAuraSignalBound = false",
+                "if RaidOptimizerHub",
+                "  and type(RaidOptimizerHub.GetMode) == \"function\"",
+                "  and RaidOptimizerHub.GetMode() == \"central\"",
+                "  and type(RaidOptimizerHub.SubscribeAuraSignal) == \"function\"",
+                "then",
+                "  raidOptimizerHubAuraSignalBound = RaidOptimizerHub.SubscribeAuraSignal(",
+                "    \"WeakAuras:BuffTrigger2:UNIT_AURA\",",
+                "    function(_, unit, updateInfo)",
+                "      local ok, err = pcall(EventHandler, Buff2Frame, \"UNIT_AURA\", unit, updateInfo)",
+                "      if not ok then",
+                "        -- A signal callback is never allowed to become WA's only broken event",
+                "        -- path.  Restore native registration immediately, then report once.",
+                "        if RaidOptimizerHub and type(RaidOptimizerHub.UnsubscribeAuraSignal) == \"function\" then",
+                "          RaidOptimizerHub.UnsubscribeAuraSignal(\"WeakAuras:BuffTrigger2:UNIT_AURA\")",
+                "        end",
+                "        Buff2Frame:RegisterEvent(\"UNIT_AURA\")",
+                "        local handler = type(geterrorhandler) == \"function\" and geterrorhandler() or nil",
+                "        if handler then handler(err) end",
+                "      end",
+                "    end) == true",
+                "end",
+                "if not raidOptimizerHubAuraSignalBound then",
+                "  Buff2Frame:RegisterEvent(\"UNIT_AURA\")",
+                "end"
+              ]
+            ],
+            [
+              4286,
+              4287,
+              [
+                "    if RaidOptimizerHub and type(RaidOptimizerHub.BindCombatLogFrame) == \"function\" then",
+                "      RaidOptimizerHub.BindCombatLogFrame(\"WeakAuras:BuffTrigger2.lua:multiAuraFrame\", multiAuraFrame, {",
+                "      filterName = \"active WA multi-target aura only\",",
+                "      subevents = {",
+                "        SPELL_AURA_APPLIED = true,",
+                "        SPELL_AURA_REFRESH = true,",
+                "        SPELL_AURA_APPLIED_DOSE = true,",
+                "        SPELL_AURA_REMOVED_DOSE = true,",
+                "        SPELL_AURA_REMOVED = true,",
+                "      },",
+                "      filter = function(_, subevent, _, _, _, _, _, _, _, _, _, spellId, spellName, _, auraType)",
+                "        if not (subevent == \"SPELL_AURA_APPLIED\"",
+                "          or subevent == \"SPELL_AURA_REFRESH\"",
+                "          or subevent == \"SPELL_AURA_APPLIED_DOSE\"",
+                "          or subevent == \"SPELL_AURA_REMOVED_DOSE\"",
+                "          or subevent == \"SPELL_AURA_REMOVED\")",
+                "        then",
+                "          return false",
+                "        end",
+                "        local filter = auraType == \"BUFF\" and \"HELPFUL\"",
+                "          or auraType == \"DEBUFF\" and \"HARMFUL\"",
+                "        if not filter then return false end",
+                "        local names = scanFuncNameMulti[filter]",
+                "        local spellIds = scanFuncSpellIdMulti[filter]",
+                "        return (names and names[spellName]) ~= nil",
+                "          or (spellIds and spellIds[spellId]) ~= nil",
+                "      end,",
+                "    })",
+                "    else",
+                "      multiAuraFrame:RegisterEvent(\"COMBAT_LOG_EVENT_UNFILTERED\")",
+                "    end"
+              ]
+            ],
+            [
+              4307,
+              4308,
+              [
+                "    CombatLog(RaidOptimizerHubCombatLogInfo())"
+              ]
+            ]
+          ],
+          "path": "BuffTrigger2.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              0,
+              12,
+              []
+            ],
+            [
+              2006,
+              2006,
+              [
+                ""
+              ]
+            ],
+            [
+              2379,
+              2405,
+              [
+                "",
+                "Buff2Frame:RegisterEvent(\"UNIT_AURA\")"
+              ]
+            ],
+            [
+              4321,
+              4352,
+              [
+                "    multiAuraFrame:RegisterEvent(\"COMBAT_LOG_EVENT_UNFILTERED\")"
+              ]
+            ],
+            [
+              4372,
+              4373,
+              [
+                "    CombatLog(CombatLogGetCurrentEventInfo())"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "862e82b2781e4917a180388106c569d45d35768aef5e73c8ac50d29b03de638e"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  10,
+                  63,
+                  []
+                ],
+                [
+                  1842,
+                  1843,
+                  [
+                    "        AuraUtil.ForEachAura(unit, filter, nil, HandleAura, true)"
+                  ]
+                ],
+                [
+                  1847,
+                  1848,
+                  [
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)"
+                  ]
+                ],
+                [
+                  1995,
+                  1996,
+                  [
+                    "              local aura = C_UnitAuras.GetAuraDataByAuraInstanceID(unit, auraInstanceID)"
+                  ]
+                ],
+                [
+                  2026,
+                  2027,
+                  [
+                    "          AuraUtil.ForEachAura(unit, filter, nil, HandleAura, true)"
+                  ]
+                ],
+                [
+                  2031,
+                  2032,
+                  [
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)"
+                  ]
+                ],
+                [
+                  2059,
+                  2242,
+                  []
+                ],
+                [
+                  2243,
+                  2245,
+                  []
+                ],
+                [
+                  2256,
+                  2257,
+                  []
+                ],
+                [
+                  2618,
+                  2628,
+                  [
+                    "-- RaidOptimizerHub coalesced native WA aura events",
+                    "local raidOptimizerHubAuraSignalBound = false",
+                    "if RaidOptimizerHub",
+                    "  and type(RaidOptimizerHub.GetMode) == \"function\"",
+                    "  and RaidOptimizerHub.GetMode() == \"central\"",
+                    "  and type(RaidOptimizerHub.SubscribeAuraSignal) == \"function\"",
+                    "then",
+                    "  raidOptimizerHubAuraSignalBound = RaidOptimizerHub.SubscribeAuraSignal(",
+                    "    \"WeakAuras:BuffTrigger2:UNIT_AURA\",",
+                    "    function(_, unit, updateInfo)",
+                    "      local ok, err = pcall(EventHandler, Buff2Frame, \"UNIT_AURA\", unit, updateInfo)",
+                    "      if not ok then",
+                    "        -- A signal callback is never allowed to become WA's only broken event",
+                    "        -- path.  Restore native registration immediately, then report once.",
+                    "        if RaidOptimizerHub and type(RaidOptimizerHub.UnsubscribeAuraSignal) == \"function\" then",
+                    "          RaidOptimizerHub.UnsubscribeAuraSignal(\"WeakAuras:BuffTrigger2:UNIT_AURA\")",
+                    "        end",
+                    "        Buff2Frame:RegisterEvent(\"UNIT_AURA\")",
+                    "        local handler = type(geterrorhandler) == \"function\" and geterrorhandler() or nil",
+                    "        if handler then handler(err) end",
+                    "      end",
+                    "    end) == true"
+                  ]
+                ],
+                [
+                  2629,
+                  2637,
+                  [
+                    "if not raidOptimizerHubAuraSignalBound then"
+                  ]
+                ],
+                [
+                  4377,
+                  4378,
+                  [
+                    "      AuraUtil.ForEachAura(unit, filter, nil, HandleAura, true)"
+                  ]
+                ],
+                [
+                  4381,
+                  4382,
+                  [
+                    "        local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, _, modRate = UnitAura(unit, index, filter)"
+                  ]
+                ],
+                [
+                  4503,
+                  4504,
+                  [
+                    "      AuraUtil.ForEachAura(unit, filter, nil, HandleAura, true)"
+                  ]
+                ],
+                [
+                  4507,
+                  4508,
+                  [
+                    "        local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, _, _, _, modRate = UnitAura(unit, index, filter)"
+                  ]
+                ]
+              ],
+              "source_sha256": "b06f7d5049ff13a65569e3636ac312ebf7c04e03d5f7a0ef32c37549e636dfe8",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  1892,
+                  1909,
+                  []
+                ],
+                [
+                  1935,
+                  1936,
+                  []
+                ],
+                [
+                  1994,
+                  2070,
+                  [
+                    "        local index = 1",
+                    "        while true do",
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)",
+                    "          if not name then",
+                    "            break"
+                  ]
+                ],
+                [
+                  2072,
+                  2095,
+                  [
+                    "          debuffClass = FixDebuffClass(debuffClass, spellId)",
+                    "",
+                    "          local updatedMatchData = UpdateMatchData(time, matchDataChanged, unit, index, nil, filter, name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, isBossDebuff, isCastByPlayer, spellId, modRate, nil)",
+                    "",
+                    "          if updatedMatchData then -- Aura data changed, check against triggerInfos",
+                    "            CheckScanFuncs(scanFuncName and scanFuncName[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncNameGroup and scanFuncNameGroup[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellId and scanFuncSpellId[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellIdGroup and scanFuncSpellIdGroup[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneral, unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneralGroup, unit, filter, index)"
+                  ]
+                ],
+                [
+                  2096,
+                  2096,
+                  [
+                    "          index = index + 1"
+                  ]
+                ],
+                [
+                  2097,
+                  2097,
+                  [
+                    "",
+                    "        CleanUpOutdatedMatchData(index, unit, filter)"
+                  ]
+                ],
+                [
+                  2101,
+                  2109,
+                  [
+                    "    matchDataUpToDate[unit][filter] = true"
+                  ]
+                ],
+                [
+                  2485,
+                  2517,
+                  []
+                ],
+                [
+                  2526,
+                  2532,
+                  []
+                ]
+              ],
+              "source_sha256": "4e3a66f9b1a7edacc802891e8e5cf421a37342df560c513cd4554991746b9492",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  667,
+                  670,
+                  [
+                    "        matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1543,
+                  1544,
+                  [
+                    "  local auraDatas = {}"
+                  ]
+                ],
+                [
+                  1545,
+                  1547,
+                  [
+                    "  local matchedUnits = {}",
+                    "  local matchCountPerUnit = {}"
+                  ]
+                ],
+                [
+                  1599,
+                  1602,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1678,
+                  1681,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1898,
+                  1982,
+                  []
+                ],
+                [
+                  2008,
+                  2009,
+                  []
+                ],
+                [
+                  2067,
+                  2136,
+                  [
+                    "        local index = 1",
+                    "        while true do",
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)",
+                    "          if not name then",
+                    "            break"
+                  ]
+                ],
+                [
+                  2138,
+                  2161,
+                  [
+                    "          debuffClass = FixDebuffClass(debuffClass, spellId)",
+                    "",
+                    "          local updatedMatchData = UpdateMatchData(time, matchDataChanged, unit, index, nil, filter, name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, isBossDebuff, isCastByPlayer, spellId, modRate, nil)",
+                    "",
+                    "          if updatedMatchData then -- Aura data changed, check against triggerInfos",
+                    "            CheckScanFuncs(scanFuncName and scanFuncName[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncNameGroup and scanFuncNameGroup[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellId and scanFuncSpellId[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellIdGroup and scanFuncSpellIdGroup[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneral, unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneralGroup, unit, filter, index)"
+                  ]
+                ],
+                [
+                  2162,
+                  2162,
+                  [
+                    "          index = index + 1"
+                  ]
+                ],
+                [
+                  2163,
+                  2163,
+                  [
+                    "",
+                    "        CleanUpOutdatedMatchData(index, unit, filter)"
+                  ]
+                ],
+                [
+                  2167,
+                  2175,
+                  [
+                    "    matchDataUpToDate[unit][filter] = true"
+                  ]
+                ],
+                [
+                  2281,
+                  2282,
+                  []
+                ],
+                [
+                  2310,
+                  2311,
+                  []
+                ],
+                [
+                  2398,
+                  2402,
+                  [
+                    "  Private.StartProfileSystem(\"bufftrigger2 - \".. event)",
+                    "  local deactivatedTriggerInfos = {}",
+                    "  local unitsToRemove = {}"
+                  ]
+                ],
+                [
+                  2530,
+                  2532,
+                  [
+                    "  DeactivateScanFuncs(deactivatedTriggerInfos)",
+                    "",
+                    "  for i, unit in ipairs(unitsToRemove) do",
+                    "    CleanUpMatchDataForUnit(unit, \"HELPFUL\")",
+                    "    CleanUpMatchDataForUnit(unit, \"HARMFUL\")",
+                    "    matchDataUpToDate[unit] = nil"
+                  ]
+                ],
+                [
+                  2534,
+                  2543,
+                  [
+                    "  Private.StopProfileSystem(\"bufftrigger2 - \".. event)"
+                  ]
+                ],
+                [
+                  2558,
+                  2607,
+                  []
+                ],
+                [
+                  2616,
+                  2622,
+                  []
+                ],
+                [
+                  2772,
+                  2773,
+                  []
+                ],
+                [
+                  2802,
+                  2803,
+                  []
+                ],
+                [
+                  2826,
+                  2828,
+                  []
+                ]
+              ],
+              "source_sha256": "d5b1e8611571011f4fe79994018a36e70637f0170470640246d1f3312fb442ce",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  667,
+                  670,
+                  [
+                    "        matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1543,
+                  1544,
+                  [
+                    "  local auraDatas = {}"
+                  ]
+                ],
+                [
+                  1545,
+                  1547,
+                  [
+                    "  local matchedUnits = {}",
+                    "  local matchCountPerUnit = {}"
+                  ]
+                ],
+                [
+                  1599,
+                  1602,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1678,
+                  1681,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1898,
+                  1986,
+                  []
+                ],
+                [
+                  2012,
+                  2013,
+                  []
+                ],
+                [
+                  2071,
+                  2140,
+                  [
+                    "        local index = 1",
+                    "        while true do",
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)",
+                    "          if not name then",
+                    "            break"
+                  ]
+                ],
+                [
+                  2142,
+                  2165,
+                  [
+                    "          debuffClass = FixDebuffClass(debuffClass, spellId)",
+                    "",
+                    "          local updatedMatchData = UpdateMatchData(time, matchDataChanged, unit, index, nil, filter, name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, isBossDebuff, isCastByPlayer, spellId, modRate, nil)",
+                    "",
+                    "          if updatedMatchData then -- Aura data changed, check against triggerInfos",
+                    "            CheckScanFuncs(scanFuncName and scanFuncName[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncNameGroup and scanFuncNameGroup[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellId and scanFuncSpellId[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellIdGroup and scanFuncSpellIdGroup[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneral, unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneralGroup, unit, filter, index)"
+                  ]
+                ],
+                [
+                  2166,
+                  2166,
+                  [
+                    "          index = index + 1"
+                  ]
+                ],
+                [
+                  2167,
+                  2167,
+                  [
+                    "",
+                    "        CleanUpOutdatedMatchData(index, unit, filter)"
+                  ]
+                ],
+                [
+                  2171,
+                  2179,
+                  [
+                    "    matchDataUpToDate[unit][filter] = true"
+                  ]
+                ],
+                [
+                  2285,
+                  2286,
+                  []
+                ],
+                [
+                  2314,
+                  2315,
+                  []
+                ],
+                [
+                  2402,
+                  2406,
+                  [
+                    "  Private.StartProfileSystem(\"bufftrigger2 - \".. event)",
+                    "  local deactivatedTriggerInfos = {}",
+                    "  local unitsToRemove = {}"
+                  ]
+                ],
+                [
+                  2534,
+                  2536,
+                  [
+                    "  DeactivateScanFuncs(deactivatedTriggerInfos)",
+                    "",
+                    "  for i, unit in ipairs(unitsToRemove) do",
+                    "    CleanUpMatchDataForUnit(unit, \"HELPFUL\")",
+                    "    CleanUpMatchDataForUnit(unit, \"HARMFUL\")",
+                    "    matchDataUpToDate[unit] = nil"
+                  ]
+                ],
+                [
+                  2538,
+                  2547,
+                  [
+                    "  Private.StopProfileSystem(\"bufftrigger2 - \".. event)"
+                  ]
+                ],
+                [
+                  2562,
+                  2744,
+                  []
+                ],
+                [
+                  2753,
+                  2762,
+                  []
+                ],
+                [
+                  2912,
+                  2913,
+                  []
+                ],
+                [
+                  2942,
+                  2943,
+                  []
+                ],
+                [
+                  2966,
+                  2968,
+                  []
+                ]
+              ],
+              "source_sha256": "29c6b5fa836823df08c12a13919175f695b7a54d95ab3d927f74968a4e5dd0bd",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  667,
+                  670,
+                  [
+                    "        matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1543,
+                  1544,
+                  [
+                    "  local auraDatas = {}"
+                  ]
+                ],
+                [
+                  1545,
+                  1547,
+                  [
+                    "  local matchedUnits = {}",
+                    "  local matchCountPerUnit = {}"
+                  ]
+                ],
+                [
+                  1599,
+                  1602,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1678,
+                  1681,
+                  [
+                    "            matchedUnits[unit] = true"
+                  ]
+                ],
+                [
+                  1898,
+                  1986,
+                  []
+                ],
+                [
+                  2012,
+                  2013,
+                  []
+                ],
+                [
+                  2071,
+                  2140,
+                  [
+                    "        local index = 1",
+                    "        while true do",
+                    "          local name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, _, spellId, _, isBossDebuff, isCastByPlayer, _, modRate = UnitAura(unit, index, filter)",
+                    "          if not name then",
+                    "            break"
+                  ]
+                ],
+                [
+                  2142,
+                  2165,
+                  [
+                    "          debuffClass = FixDebuffClass(debuffClass, spellId)",
+                    "",
+                    "          local updatedMatchData = UpdateMatchData(time, matchDataChanged, unit, index, nil, filter, name, icon, stacks, debuffClass, duration, expirationTime, unitCaster, isStealable, isBossDebuff, isCastByPlayer, spellId, modRate, nil)",
+                    "",
+                    "          if updatedMatchData then -- Aura data changed, check against triggerInfos",
+                    "            CheckScanFuncs(scanFuncName and scanFuncName[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncNameGroup and scanFuncNameGroup[name], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellId and scanFuncSpellId[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncSpellIdGroup and scanFuncSpellIdGroup[spellId], unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneral, unit, filter, index)",
+                    "            CheckScanFuncs(scanFuncGeneralGroup, unit, filter, index)"
+                  ]
+                ],
+                [
+                  2166,
+                  2166,
+                  [
+                    "          index = index + 1"
+                  ]
+                ],
+                [
+                  2167,
+                  2167,
+                  [
+                    "",
+                    "        CleanUpOutdatedMatchData(index, unit, filter)"
+                  ]
+                ],
+                [
+                  2171,
+                  2179,
+                  [
+                    "    matchDataUpToDate[unit][filter] = true"
+                  ]
+                ],
+                [
+                  2285,
+                  2286,
+                  []
+                ],
+                [
+                  2314,
+                  2315,
+                  []
+                ],
+                [
+                  2402,
+                  2406,
+                  [
+                    "  Private.StartProfileSystem(\"bufftrigger2 - \".. event)",
+                    "  local deactivatedTriggerInfos = {}",
+                    "  local unitsToRemove = {}"
+                  ]
+                ],
+                [
+                  2534,
+                  2536,
+                  [
+                    "  DeactivateScanFuncs(deactivatedTriggerInfos)",
+                    "",
+                    "  for i, unit in ipairs(unitsToRemove) do",
+                    "    CleanUpMatchDataForUnit(unit, \"HELPFUL\")",
+                    "    CleanUpMatchDataForUnit(unit, \"HARMFUL\")",
+                    "    matchDataUpToDate[unit] = nil"
+                  ]
+                ],
+                [
+                  2538,
+                  2547,
+                  [
+                    "  Private.StopProfileSystem(\"bufftrigger2 - \".. event)"
+                  ]
+                ],
+                [
+                  2562,
+                  2825,
+                  []
+                ],
+                [
+                  2834,
+                  2843,
+                  []
+                ],
+                [
+                  2993,
+                  2994,
+                  []
+                ],
+                [
+                  3023,
+                  3024,
+                  []
+                ],
+                [
+                  3047,
+                  3049,
+                  []
+                ]
+              ],
+              "source_sha256": "ce0607907b955a59f5e8f6c75289c849126b5ff9d61c44d640e6f57a7d0879f4",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "330d4a5655a0284cb5e74b1c8696cc96d58a1172d97c808d686b5248b8bdb7ec",
+          "base_approved_sha256": "330d4a5655a0284cb5e74b1c8696cc96d58a1172d97c808d686b5248b8bdb7ec",
+          "clean_sha256": "94bf9166cde5f0d81ace12a818c91e9522d32489a6fbafa5e326250b70a8fa9d",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              23,
+              23,
+              [
+                "## OptionalDeps: RaidOptimizerHub"
+              ]
+            ]
+          ],
+          "path": "WeakAuras_Cata.toc",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "330d4a5655a0284cb5e74b1c8696cc96d58a1172d97c808d686b5248b8bdb7ec"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  21,
+                  22,
+                  [
+                    "## OptionalDeps: Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core"
+                  ]
+                ]
+              ],
+              "source_sha256": "bb6c25bcb2caf998a7da8d100bef0570b428652a5ea8d6a2a4cf32e8ba78f04b",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "fb73276fb6f230e4d40a3590ff0df46d77448d58c9df6cfcb94e63d60201d3f2",
+          "base_approved_sha256": "fb73276fb6f230e4d40a3590ff0df46d77448d58c9df6cfcb94e63d60201d3f2",
+          "clean_sha256": "400fe6d701ee0e8e6c5ab5b35bab36a25d2ed8b8716e79aa55dee8fbd3d00135",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              23,
+              23,
+              [
+                "## OptionalDeps: RaidOptimizerHub"
+              ]
+            ]
+          ],
+          "path": "WeakAuras_Mists.toc",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "fb73276fb6f230e4d40a3590ff0df46d77448d58c9df6cfcb94e63d60201d3f2"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  21,
+                  22,
+                  [
+                    "## OptionalDeps: Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core"
+                  ]
+                ]
+              ],
+              "source_sha256": "ea1dbeaa8d0906fedfb176234393b317418b7d4f47c5c6ac340ae1f2a6ba55e5",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "cb272d4a976678d45446a54b4c052b96e3f3dbb9e9740b3b28e0e2b652ae3007",
+          "base_approved_sha256": "cb272d4a976678d45446a54b4c052b96e3f3dbb9e9740b3b28e0e2b652ae3007",
+          "clean_sha256": "b21a1acfb47fd00e09d55f09058cef173c80860846f1545cbb90ea6768b86a22",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              23,
+              23,
+              [
+                "## OptionalDeps: RaidOptimizerHub"
+              ]
+            ]
+          ],
+          "path": "WeakAuras_TBC.toc",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "cb272d4a976678d45446a54b4c052b96e3f3dbb9e9740b3b28e0e2b652ae3007"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  21,
+                  22,
+                  [
+                    "## OptionalDeps: Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core"
+                  ]
+                ]
+              ],
+              "source_sha256": "9a80553126dc658f0e7fc870612f96cc3d9aeff08d94de249697403aa488e0aa",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "d125444bdf83959d4c2f75e1daee214381f7d7d256c2acdbf0d2aad3eef4a543",
+          "base_approved_sha256": "d125444bdf83959d4c2f75e1daee214381f7d7d256c2acdbf0d2aad3eef4a543",
+          "clean_sha256": "b11b9d51396967957e44423f171211a02ced488e7d53defdce49ea2ae1214781",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              22,
+              22,
+              [
+                "## OptionalDeps: RaidOptimizerHub"
+              ]
+            ]
+          ],
+          "path": "WeakAuras_Vanilla.toc",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "d125444bdf83959d4c2f75e1daee214381f7d7d256c2acdbf0d2aad3eef4a543"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  21,
+                  22,
+                  [
+                    "## OptionalDeps: Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core"
+                  ]
+                ]
+              ],
+              "source_sha256": "4cc5036592b5459b2772ab5b49285c69daedc57d7eebca4a9e0c701d779a6b7a",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "9e6b390d74ab001092318493df6e3c01cc1793f0a6f8f57b4f72ef290274f7d2",
+          "base_approved_sha256": "9e6b390d74ab001092318493df6e3c01cc1793f0a6f8f57b4f72ef290274f7d2",
+          "clean_sha256": "a630adc139f12578fe1bfd2db9b18ccee0ba82a32d1346669c0387cb36528d8e",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              23,
+              23,
+              [
+                "## OptionalDeps: RaidOptimizerHub"
+              ]
+            ]
+          ],
+          "path": "WeakAuras_Wrath.toc",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "9e6b390d74ab001092318493df6e3c01cc1793f0a6f8f57b4f72ef290274f7d2"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  21,
+                  22,
+                  [
+                    "## OptionalDeps: Ace3, LibCompress, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, Masque, GTFO, LibButtonGlow-1.0, LibSpellRange-1.0, LibRangeCheck-3.0, LibDBIcon-1.0, LibGetFrame-1.0, !LibUIDropDownMenu, !!AddonLocale, CustomNames, BigWigs, DBM-Core"
+                  ]
+                ]
+              ],
+              "source_sha256": "dfc2df25859d8b469efa7025c93568750453a44b61134a147f6cf05cd544b30b",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "c048b67ac0de71acfe10599fd1ce93d6caa642187514ea698afffb46d5f94034",
+          "base_approved_sha256": "e91906c71b08c6acb882296f75bbbdbd0e2723c7f9b95e054322dc3888d1ae2d",
+          "clean_sha256": "3d579dfae1e3254dde95a84c6e4ac1adf721d01f09d472356d7056014852d0f8",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              1053,
+              1053,
+              [
+                "-- RaidOptimizerHub restricted custom-grow transaction begin",
+                "local raidOptimizerHubPendingCustomGrowLayouts = setmetatable({}, { __mode = \"k\" })",
+                "RaidOptimizerHubWeakAurasCustomGrowLayoutStats = RaidOptimizerHubWeakAurasCustomGrowLayoutStats or {}",
+                "local raidOptimizerHubCustomGrowLayoutStats = RaidOptimizerHubWeakAurasCustomGrowLayoutStats",
+                "raidOptimizerHubCustomGrowLayoutStats.deferred = tonumber(raidOptimizerHubCustomGrowLayoutStats.deferred) or 0",
+                "raidOptimizerHubCustomGrowLayoutStats.coalesced = tonumber(raidOptimizerHubCustomGrowLayoutStats.coalesced) or 0",
+                "raidOptimizerHubCustomGrowLayoutStats.replayed = tonumber(raidOptimizerHubCustomGrowLayoutStats.replayed) or 0",
+                "raidOptimizerHubCustomGrowLayoutStats.dropped = tonumber(raidOptimizerHubCustomGrowLayoutStats.dropped) or 0",
+                "raidOptimizerHubCustomGrowLayoutStats.errors = tonumber(raidOptimizerHubCustomGrowLayoutStats.errors) or 0",
+                "",
+                "local function RaidOptimizerHubIsMistsClient()",
+                "  if type(GetBuildInfo) ~= \"function\" then",
+                "    return false",
+                "  end",
+                "  local _, _, _, interfaceVersion = GetBuildInfo()",
+                "  interfaceVersion = tonumber(interfaceVersion) or 0",
+                "  return interfaceVersion >= 50500 and interfaceVersion < 50600",
+                "end",
+                "",
+                "local function RaidOptimizerHubDynamicGroupFrameIsRestricted(frame)",
+                "  if not frame then",
+                "    return false",
+                "  end",
+                "  if type(frame.IsProtected) == \"function\" then",
+                "    local ok, protected = pcall(frame.IsProtected, frame)",
+                "    if ok and protected then",
+                "      return true",
+                "    end",
+                "  end",
+                "  return false",
+                "end",
+                "",
+                "local function RaidOptimizerHubDynamicGroupRegionDataIsRestricted(regionData)",
+                "  return type(regionData) == \"table\"",
+                "    and (RaidOptimizerHubDynamicGroupFrameIsRestricted(regionData.region)",
+                "      or RaidOptimizerHubDynamicGroupFrameIsRestricted(regionData.controlPoint))",
+                "end",
+                "",
+                "local function RaidOptimizerHubDynamicGroupFamilyIsRestricted(region)",
+                "  -- IsAnchoringRestricted also includes harmless PRD/nameplate anchoring.",
+                "  -- The observed Mists failure is narrower: ClearAllPoints on a genuinely",
+                "  -- protected frame.  Inspect the live family for that exact condition.",
+                "  if RaidOptimizerHubDynamicGroupFrameIsRestricted(region) then",
+                "    return true",
+                "  end",
+                "  for _, regionData in ipairs(region.sortedChildren or {}) do",
+                "    if RaidOptimizerHubDynamicGroupRegionDataIsRestricted(regionData) then",
+                "      return true",
+                "    end",
+                "  end",
+                "  for _, clones in pairs(region.controlledChildren or {}) do",
+                "    if type(clones) == \"table\" then",
+                "      for _, controlPoint in pairs(clones) do",
+                "        if RaidOptimizerHubDynamicGroupFrameIsRestricted(controlPoint)",
+                "          or RaidOptimizerHubDynamicGroupRegionDataIsRestricted(controlPoint.regionData)",
+                "        then",
+                "          return true",
+                "        end",
+                "      end",
+                "    end",
+                "  end",
+                "  return false",
+                "end",
+                "",
+                "local function RaidOptimizerHubShouldDeferCustomGrowLayout(region, data)",
+                "  if RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedCustomGrowLayout == false then",
+                "    return false",
+                "  end",
+                "  if type(data) ~= \"table\"",
+                "    or not RaidOptimizerHubIsMistsClient()",
+                "    or not (InCombatLockdown and InCombatLockdown())",
+                "  then",
+                "    return false",
+                "  end",
+                "",
+                "  local pending = raidOptimizerHubPendingCustomGrowLayouts[region]",
+                "  if pending then",
+                "    region.needToPosition = true",
+                "    raidOptimizerHubCustomGrowLayoutStats.coalesced = raidOptimizerHubCustomGrowLayoutStats.coalesced + 1",
+                "    return true",
+                "  end",
+                "  if not RaidOptimizerHubDynamicGroupFamilyIsRestricted(region) then",
+                "    return false",
+                "  end",
+                "",
+                "  raidOptimizerHubPendingCustomGrowLayouts[region] = {",
+                "    id = data.id,",
+                "    uid = data.uid,",
+                "  }",
+                "  region.needToPosition = true",
+                "  raidOptimizerHubCustomGrowLayoutStats.deferred = raidOptimizerHubCustomGrowLayoutStats.deferred + 1",
+                "  return true",
+                "end",
+                "",
+                "local raidOptimizerHubCustomGrowLayoutFrame = CreateFrame(\"Frame\")",
+                "raidOptimizerHubCustomGrowLayoutFrame:RegisterEvent(\"PLAYER_REGEN_ENABLED\")",
+                "raidOptimizerHubCustomGrowLayoutFrame:SetScript(\"OnEvent\", function()",
+                "  local pendingLayouts = raidOptimizerHubPendingCustomGrowLayouts",
+                "  raidOptimizerHubPendingCustomGrowLayouts = setmetatable({}, { __mode = \"k\" })",
+                "",
+                "  for region, pending in pairs(pendingLayouts) do",
+                "    local currentRegion = region",
+                "    if type(WeakAuras.GetRegion) == \"function\" and type(pending.id) == \"string\" then",
+                "      currentRegion = WeakAuras.GetRegion(pending.id)",
+                "    end",
+                "    if currentRegion ~= region or region.regionType ~= \"dynamicgroup\"",
+                "      or type(region.PositionChildren) ~= \"function\"",
+                "    then",
+                "      raidOptimizerHubCustomGrowLayoutStats.dropped = raidOptimizerHubCustomGrowLayoutStats.dropped + 1",
+                "    else",
+                "      -- Re-enter WeakAuras through its native layout method.  If WA still has",
+                "      -- the group suspended, PositionChildren keeps needToPosition set and",
+                "      -- the native Resume path completes it later.",
+                "      region.needToPosition = true",
+                "      local errorHandler = type(geterrorhandler) == \"function\" and geterrorhandler() or function() end",
+                "      local ok = xpcall(region.PositionChildren, errorHandler, region)",
+                "      if ok then",
+                "        raidOptimizerHubCustomGrowLayoutStats.replayed = raidOptimizerHubCustomGrowLayoutStats.replayed + 1",
+                "      else",
+                "        raidOptimizerHubCustomGrowLayoutStats.errors = raidOptimizerHubCustomGrowLayoutStats.errors + 1",
+                "      end",
+                "    end",
+                "  end",
+                "end)",
+                "-- RaidOptimizerHub restricted custom-grow transaction end",
+                ""
+              ]
+            ],
+            [
+              1323,
+              1323,
+              [
+                "    -- RaidOptimizerHub restricted custom-grow guard begin",
+                "    if RaidOptimizerHubShouldDeferCustomGrowLayout(self, data) then",
+                "      return",
+                "    end",
+                "    -- RaidOptimizerHub restricted custom-grow guard end"
+              ]
+            ],
+            [
+              1493,
+              1493,
+              [
+                "    -- RaidOptimizerHub restricted custom-grow guard begin",
+                "    if RaidOptimizerHubShouldDeferCustomGrowLayout(self, data) then",
+                "      return",
+                "    end",
+                "    -- RaidOptimizerHub restricted custom-grow guard end"
+              ]
+            ]
+          ],
+          "path": "RegionTypes/DynamicGroup.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              11,
+              11,
+              [
+                "local LGF = (LibStub(\"RaidOptimizerHub-WeakAuras-LibGetFrame-1.0\", true) or LibStub(\"LibGetFrame-1.0\"))"
+              ]
+            ],
+            [
+              408,
+              409,
+              [
+                "          local frame = LGF.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+              ]
+            ],
+            [
+              1064,
+              1073,
+              []
+            ],
+            [
+              1094,
+              1096,
+              [
+                "  -- The observed failure is narrow: a geometry call on a genuinely protected",
+                "  -- frame. Inspect the live family for that exact condition."
+              ]
+            ],
+            [
+              1123,
+              1124,
+              []
+            ],
+            [
+              1745,
+              1745,
+              [
+                "",
+                "if type(LGF.RaidOptimizerRegisterBinding) == \"function\" then",
+                "  LGF:RaidOptimizerRegisterBinding(\"dynamicGroup\", \"wa-5.21.8-lgf74-private2\")",
+                "end"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "e91906c71b08c6acb882296f75bbbdbd0e2723c7f9b95e054322dc3888d1ae2d"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  0,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  1063,
+                  1063,
+                  [
+                    "local function RaidOptimizerHubIsMistsClient()",
+                    "  if type(GetBuildInfo) ~= \"function\" then",
+                    "    return false",
+                    "  end",
+                    "  local _, _, _, interfaceVersion = GetBuildInfo()",
+                    "  interfaceVersion = tonumber(interfaceVersion) or 0",
+                    "  return interfaceVersion >= 50500 and interfaceVersion < 50600",
+                    "end",
+                    ""
+                  ]
+                ],
+                [
+                  1066,
+                  1072,
+                  []
+                ],
+                [
+                  1089,
+                  1101,
+                  [
+                    "  -- IsAnchoringRestricted also includes harmless PRD/nameplate anchoring.",
+                    "  -- The observed Mists failure is narrower: ClearAllPoints on a genuinely",
+                    "  -- protected frame.  Inspect the live family for that exact condition.",
+                    "  if RaidOptimizerHubDynamicGroupFrameIsRestricted(region) then",
+                    "    return true"
+                  ]
+                ],
+                [
+                  1102,
+                  1114,
+                  []
+                ],
+                [
+                  1137,
+                  1138,
+                  [
+                    "  if type(data) ~= \"table\"",
+                    "    or not RaidOptimizerHubIsMistsClient()"
+                  ]
+                ]
+              ],
+              "source_sha256": "b5e5703276dc12e43e73a8125848381dbcf5eedd2da0dc0b1657711350daaa6e",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  0,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  10,
+                  11,
+                  []
+                ],
+                [
+                  408,
+                  409,
+                  [
+                    "          local frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+                  ]
+                ],
+                [
+                  1064,
+                  1064,
+                  [
+                    "local function RaidOptimizerHubIsMistsClient()",
+                    "  if type(GetBuildInfo) ~= \"function\" then",
+                    "    return false",
+                    "  end",
+                    "  local _, _, _, interfaceVersion = GetBuildInfo()",
+                    "  interfaceVersion = tonumber(interfaceVersion) or 0",
+                    "  return interfaceVersion >= 50500 and interfaceVersion < 50600",
+                    "end",
+                    ""
+                  ]
+                ],
+                [
+                  1067,
+                  1073,
+                  []
+                ],
+                [
+                  1090,
+                  1102,
+                  [
+                    "  -- IsAnchoringRestricted also includes harmless PRD/nameplate anchoring.",
+                    "  -- The observed Mists failure is narrower: ClearAllPoints on a genuinely",
+                    "  -- protected frame.  Inspect the live family for that exact condition.",
+                    "  if RaidOptimizerHubDynamicGroupFrameIsRestricted(region) then",
+                    "    return true"
+                  ]
+                ],
+                [
+                  1103,
+                  1115,
+                  []
+                ],
+                [
+                  1138,
+                  1139,
+                  [
+                    "  if type(data) ~= \"table\"",
+                    "    or not RaidOptimizerHubIsMistsClient()"
+                  ]
+                ],
+                [
+                  1760,
+                  1764,
+                  []
+                ]
+              ],
+              "source_sha256": "7d0698525585cf0401440ea0d38449f6b08d603649d98bcc3961de3481379849",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  11,
+                  12,
+                  []
+                ],
+                [
+                  409,
+                  410,
+                  [
+                    "          local frame = WeakAuras.GetUnitFrame(unit) or WeakAuras.HiddenFrames"
+                  ]
+                ],
+                [
+                  1746,
+                  1750,
+                  []
+                ]
+              ],
+              "source_sha256": "ea901a3bbbbbcef7d7d0f6dc9225bf92761e48c8e0b4d0c8c2bdb405f5c5ca88",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "c5e73cc65a6875e7d0501939b1a15498f0b6bb703e26b3b0ef8942da46616c87",
+          "base_approved_sha256": "c5e73cc65a6875e7d0501939b1a15498f0b6bb703e26b3b0ef8942da46616c87",
+          "clean_sha256": "96fe2a9d82016180f0e0ead4902839f32de24e94a267a8fbece906a1eed61080",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              444,
+              444,
+              [
+                "",
+                "-- RaidOptimizerHub read-only animation snapshot",
+                "function WeakAuras.GetRaidOptimizerAnimationSnapshot()",
+                "  local result = {",
+                "    active = 0,",
+                "    looping = 0,",
+                "    byAura = {},",
+                "    byType = {},",
+                "  }",
+                "  for _, animation in pairs(animations) do",
+                "    result.active = result.active + 1",
+                "    if animation.loop then",
+                "      result.looping = result.looping + 1",
+                "    end",
+                "    local animationType = tostring(animation.type or \"unknown\")",
+                "    result.byType[animationType] = (result.byType[animationType] or 0) + 1",
+                "    local region = animation.region",
+                "    local id = tostring(region and region.id or animation.auraUID or \"unknown\")",
+                "    local row = result.byAura[id]",
+                "    if not row then",
+                "      row = { active = 0, looping = 0, clones = 0, byType = {} }",
+                "      result.byAura[id] = row",
+                "    end",
+                "    row.active = row.active + 1",
+                "    if animation.loop then row.looping = row.looping + 1 end",
+                "    if region and region.cloneId then row.clones = row.clones + 1 end",
+                "    row.byType[animationType] = (row.byType[animationType] or 0) + 1",
+                "  end",
+                "  return result",
+                "end",
+                "-- RaidOptimizerHub read-only animation snapshot end"
+              ]
+            ]
+          ],
+          "path": "Animations.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "c5e73cc65a6875e7d0501939b1a15498f0b6bb703e26b3b0ef8942da46616c87"
+          ]
+        },
+        {
+          "approved_sha256": "eeb119a596c052435eb1c9c7ef3256d678c396a5c6b39710afe3a3bdf806b867",
+          "base_approved_sha256": "9ac69197364724c3a5ef2db397ba14ce1f9b9cb1021aa057f42462b5a8ddc7aa",
+          "clean_sha256": "359b2485c38509b7b7cc85894aa2f4c7a26ec975ee18e809b2e528abf0769fab",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              12,
+              13,
+              [
+                "local LGF = (LibStub(\"RaidOptimizerHub-WeakAuras-LibGetFrame-1.0\", true) or LibStub(\"LibGetFrame-1.0\"))"
+              ]
+            ],
+            [
+              830,
+              830,
+              [
+                "",
+                "-- RaidOptimizerHub read-only profiling export",
+                "function WeakAuras.GetRaidOptimizerDisplayWorkSnapshot()",
+                "  local function CaptureRegionWork()",
+                "    local result = {",
+                "      regions = 0,",
+                "      visibleRegions = 0,",
+                "      cloneRegions = 0,",
+                "      frameTickRegions = 0,",
+                "      byAura = {},",
+                "    }",
+                "    local function AddRegion(id, region, isClone)",
+                "      if type(region) ~= \"table\" then return end",
+                "      result.regions = result.regions + 1",
+                "      if isClone then result.cloneRegions = result.cloneRegions + 1 end",
+                "      if region.toShow then result.visibleRegions = result.visibleRegions + 1 end",
+                "      local hasFrameTick = false",
+                "      if region.toShow",
+                "        and region.subRegionEvents",
+                "        and type(region.subRegionEvents.HasSubscribers) == \"function\"",
+                "      then",
+                "        local ok, value = pcall(",
+                "          region.subRegionEvents.HasSubscribers,",
+                "          region.subRegionEvents,",
+                "          \"FrameTick\")",
+                "        hasFrameTick = ok and value and true or false",
+                "      end",
+                "      if hasFrameTick then result.frameTickRegions = result.frameTickRegions + 1 end",
+                "      id = tostring(id or region.id or \"unknown\")",
+                "      local row = result.byAura[id]",
+                "      if not row then",
+                "        row = { regions = 0, visibleRegions = 0, clones = 0, frameTickRegions = 0 }",
+                "        result.byAura[id] = row",
+                "      end",
+                "      row.regions = row.regions + 1",
+                "      if region.toShow then row.visibleRegions = row.visibleRegions + 1 end",
+                "      if isClone then row.clones = row.clones + 1 end",
+                "      if hasFrameTick then row.frameTickRegions = row.frameTickRegions + 1 end",
+                "    end",
+                "    for id, regionData in pairs(Private.regions or {}) do",
+                "      AddRegion(id, type(regionData) == \"table\" and regionData.region or nil, false)",
+                "    end",
+                "    for id, auraClones in pairs(Private.clones or {}) do",
+                "      for _, region in pairs(auraClones or {}) do AddRegion(id, region, true) end",
+                "    end",
+                "    return result",
+                "  end",
+                "  local animationSnapshot",
+                "  if type(WeakAuras.GetRaidOptimizerAnimationSnapshot) == \"function\" then",
+                "    local ok, value = pcall(WeakAuras.GetRaidOptimizerAnimationSnapshot)",
+                "    if ok and type(value) == \"table\" then animationSnapshot = value end",
+                "  end",
+                "  local cleuStats = RaidOptimizerHubWeakAurasCleuDispatchStats or {}",
+                "  local privateCleuStats = RaidOptimizerHubWeakAurasPrivateCleuStats or {}",
+                "  return {",
+                "    animationSnapshot = animationSnapshot,",
+                "    regionSnapshot = CaptureRegionWork(),",
+                "    knownCustomCleuRejects = tonumber(",
+                "      cleuStats.raidOptimizerKnownCustomCleuRejects) or 0,",
+                "    sourcePlayerRejects = tonumber(cleuStats.sourcePlayerRejects) or 0,",
+                "    plannedDisplays = tonumber(cleuStats.plannedDisplays) or 0,",
+                "    nativeDisplays = tonumber(cleuStats.nativeDisplays) or 0,",
+                "    swingTimerBindings = tonumber(privateCleuStats.swingTimerBindings) or 0,",
+                "  }",
+                "end",
+                "",
+                "function WeakAuras.GetRaidOptimizerProfileSnapshot()",
+                "  local function CopyProfileMap(source)",
+                "    local result = {}",
+                "    for key, value in pairs(source or {}) do",
+                "      if type(value) == \"table\" then",
+                "        result[key] = {",
+                "          elapsed = tonumber(value.elapsed) or 0,",
+                "          spike = tonumber(value.spike) or 0,",
+                "          count = tonumber(value.count) or 0,",
+                "        }",
+                "      end",
+                "    end",
+                "    return result",
+                "  end",
+                "  return {",
+                "    systems = CopyProfileMap(profileData.systems),",
+                "    auras = CopyProfileMap(profileData.auras),",
+                "    displayWork = WeakAuras.GetRaidOptimizerDisplayWorkSnapshot(),",
+                "    integration = {",
+                "      patch = \"RaidOptimizerHub integration patch v20\",",
+                "      eventScopeDynamicGroupBatch = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waEventBatch == false),",
+                "      targetedDynamicGroups = true,",
+                "      unitEventDynamicGroupBatch = true,",
+                "      auraStateDynamicGroupBatch = true,",
+                "      protectedLayoutTimer = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedLayoutTimer == false),",
+                "      layoutTimerDeferred = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.deferred) or 0,",
+                "      layoutTimerReplayed = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.replayed) or 0,",
+                "      layoutTimerFallback = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.fallback) or 0,",
+                "      layoutTimerDropped = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.dropped) or 0,",
+                "      protectedCustomGrowLayout = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedCustomGrowLayout == false),",
+                "      customGrowLayoutDeferred = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.deferred) or 0,",
+                "      customGrowLayoutCoalesced = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.coalesced) or 0,",
+                "      customGrowLayoutReplayed = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.replayed) or 0,",
+                "      customGrowLayoutDropped = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.dropped) or 0,",
+                "      customGrowLayoutErrors = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.errors) or 0,",
+                "      legacyAuraDelta = RaidOptimizerHubDB and RaidOptimizerHubDB.waLegacyAuraDelta == true or false,",
+                "      nativeEveryFrame = true,",
+                "    },",
+                "  }",
+                "end",
+                "",
+                "if type(LGF.RaidOptimizerRegisterBinding) == \"function\" then",
+                "  LGF:RaidOptimizerRegisterBinding(\"profiling\", \"wa-5.21.8-lgf74-private2\")",
+                "end"
+              ]
+            ]
+          ],
+          "path": "Profiling.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              894,
+              894,
+              [
+                "    statusPlayerAuraBindings = tonumber(",
+                "      privateCleuStats.statusPlayerAuraBindings) or 0,"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": [
+            "9ac69197364724c3a5ef2db397ba14ce1f9b9cb1021aa057f42462b5a8ddc7aa"
+          ],
+          "upgrade_sources": [
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  13,
+                  14,
+                  [
+                    "local LGF = (LibStub(\"RaidOptimizerHub-WeakAuras-LibGetFrame-1.0\", true) or LibStub(\"LibGetFrame-1.0\"))"
+                  ]
+                ],
+                [
+                  833,
+                  833,
+                  [
+                    "function WeakAuras.GetRaidOptimizerDisplayWorkSnapshot()",
+                    "  local function CaptureRegionWork()",
+                    "    local result = {",
+                    "      regions = 0,",
+                    "      visibleRegions = 0,",
+                    "      cloneRegions = 0,",
+                    "      frameTickRegions = 0,",
+                    "      byAura = {},",
+                    "    }",
+                    "    local function AddRegion(id, region, isClone)",
+                    "      if type(region) ~= \"table\" then return end",
+                    "      result.regions = result.regions + 1",
+                    "      if isClone then result.cloneRegions = result.cloneRegions + 1 end",
+                    "      if region.toShow then result.visibleRegions = result.visibleRegions + 1 end",
+                    "      local hasFrameTick = false",
+                    "      if region.toShow",
+                    "        and region.subRegionEvents",
+                    "        and type(region.subRegionEvents.HasSubscribers) == \"function\"",
+                    "      then",
+                    "        local ok, value = pcall(",
+                    "          region.subRegionEvents.HasSubscribers,",
+                    "          region.subRegionEvents,",
+                    "          \"FrameTick\")",
+                    "        hasFrameTick = ok and value and true or false",
+                    "      end",
+                    "      if hasFrameTick then result.frameTickRegions = result.frameTickRegions + 1 end",
+                    "      id = tostring(id or region.id or \"unknown\")",
+                    "      local row = result.byAura[id]",
+                    "      if not row then",
+                    "        row = { regions = 0, visibleRegions = 0, clones = 0, frameTickRegions = 0 }",
+                    "        result.byAura[id] = row",
+                    "      end",
+                    "      row.regions = row.regions + 1",
+                    "      if region.toShow then row.visibleRegions = row.visibleRegions + 1 end",
+                    "      if isClone then row.clones = row.clones + 1 end",
+                    "      if hasFrameTick then row.frameTickRegions = row.frameTickRegions + 1 end",
+                    "    end",
+                    "    for id, regionData in pairs(Private.regions or {}) do",
+                    "      AddRegion(id, type(regionData) == \"table\" and regionData.region or nil, false)",
+                    "    end",
+                    "    for id, auraClones in pairs(Private.clones or {}) do",
+                    "      for _, region in pairs(auraClones or {}) do AddRegion(id, region, true) end",
+                    "    end",
+                    "    return result",
+                    "  end",
+                    "  local animationSnapshot",
+                    "  if type(WeakAuras.GetRaidOptimizerAnimationSnapshot) == \"function\" then",
+                    "    local ok, value = pcall(WeakAuras.GetRaidOptimizerAnimationSnapshot)",
+                    "    if ok and type(value) == \"table\" then animationSnapshot = value end",
+                    "  end",
+                    "  local cleuStats = RaidOptimizerHubWeakAurasCleuDispatchStats or {}",
+                    "  local privateCleuStats = RaidOptimizerHubWeakAurasPrivateCleuStats or {}",
+                    "  return {",
+                    "    animationSnapshot = animationSnapshot,",
+                    "    regionSnapshot = CaptureRegionWork(),",
+                    "    knownCustomCleuRejects = tonumber(",
+                    "      cleuStats.raidOptimizerKnownCustomCleuRejects) or 0,",
+                    "    sourcePlayerRejects = tonumber(cleuStats.sourcePlayerRejects) or 0,",
+                    "    plannedDisplays = tonumber(cleuStats.plannedDisplays) or 0,",
+                    "    nativeDisplays = tonumber(cleuStats.nativeDisplays) or 0,",
+                    "    swingTimerBindings = tonumber(privateCleuStats.swingTimerBindings) or 0,",
+                    "  }",
+                    "end",
+                    ""
+                  ]
+                ],
+                [
+                  850,
+                  850,
+                  [
+                    "    displayWork = WeakAuras.GetRaidOptimizerDisplayWorkSnapshot(),"
+                  ]
+                ],
+                [
+                  851,
+                  852,
+                  [
+                    "      patch = \"RaidOptimizerHub integration patch v20\","
+                  ]
+                ],
+                [
+                  856,
+                  856,
+                  [
+                    "      protectedLayoutTimer = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedLayoutTimer == false),",
+                    "      layoutTimerDeferred = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.deferred) or 0,",
+                    "      layoutTimerReplayed = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.replayed) or 0,",
+                    "      layoutTimerFallback = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.fallback) or 0,",
+                    "      layoutTimerDropped = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.dropped) or 0,",
+                    "      protectedCustomGrowLayout = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedCustomGrowLayout == false),",
+                    "      customGrowLayoutDeferred = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.deferred) or 0,",
+                    "      customGrowLayoutCoalesced = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.coalesced) or 0,",
+                    "      customGrowLayoutReplayed = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.replayed) or 0,",
+                    "      customGrowLayoutDropped = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.dropped) or 0,",
+                    "      customGrowLayoutErrors = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.errors) or 0,",
+                    "      legacyAuraDelta = RaidOptimizerHubDB and RaidOptimizerHubDB.waLegacyAuraDelta == true or false,"
+                  ]
+                ],
+                [
+                  860,
+                  860,
+                  [
+                    "",
+                    "if type(LGF.RaidOptimizerRegisterBinding) == \"function\" then",
+                    "  LGF:RaidOptimizerRegisterBinding(\"profiling\", \"wa-5.21.8-lgf74-private2\")",
+                    "end"
+                  ]
+                ]
+              ],
+              "source_sha256": "728d79c3acea0ac1d240f89ff46eb02975cec0521c8102e4b911c32e47892b62",
+              "trailing_newline": true
+            },
+            {
+              "newline_mode": "lf",
+              "ops": [
+                [
+                  0,
+                  1,
+                  [
+                    "-- RaidOptimizerHub integration patch v20"
+                  ]
+                ],
+                [
+                  833,
+                  833,
+                  [
+                    "function WeakAuras.GetRaidOptimizerDisplayWorkSnapshot()",
+                    "  local function CaptureRegionWork()",
+                    "    local result = {",
+                    "      regions = 0,",
+                    "      visibleRegions = 0,",
+                    "      cloneRegions = 0,",
+                    "      frameTickRegions = 0,",
+                    "      byAura = {},",
+                    "    }",
+                    "    local function AddRegion(id, region, isClone)",
+                    "      if type(region) ~= \"table\" then return end",
+                    "      result.regions = result.regions + 1",
+                    "      if isClone then result.cloneRegions = result.cloneRegions + 1 end",
+                    "      if region.toShow then result.visibleRegions = result.visibleRegions + 1 end",
+                    "      local hasFrameTick = false",
+                    "      if region.toShow",
+                    "        and region.subRegionEvents",
+                    "        and type(region.subRegionEvents.HasSubscribers) == \"function\"",
+                    "      then",
+                    "        local ok, value = pcall(",
+                    "          region.subRegionEvents.HasSubscribers,",
+                    "          region.subRegionEvents,",
+                    "          \"FrameTick\")",
+                    "        hasFrameTick = ok and value and true or false",
+                    "      end",
+                    "      if hasFrameTick then result.frameTickRegions = result.frameTickRegions + 1 end",
+                    "      id = tostring(id or region.id or \"unknown\")",
+                    "      local row = result.byAura[id]",
+                    "      if not row then",
+                    "        row = { regions = 0, visibleRegions = 0, clones = 0, frameTickRegions = 0 }",
+                    "        result.byAura[id] = row",
+                    "      end",
+                    "      row.regions = row.regions + 1",
+                    "      if region.toShow then row.visibleRegions = row.visibleRegions + 1 end",
+                    "      if isClone then row.clones = row.clones + 1 end",
+                    "      if hasFrameTick then row.frameTickRegions = row.frameTickRegions + 1 end",
+                    "    end",
+                    "    for id, regionData in pairs(Private.regions or {}) do",
+                    "      AddRegion(id, type(regionData) == \"table\" and regionData.region or nil, false)",
+                    "    end",
+                    "    for id, auraClones in pairs(Private.clones or {}) do",
+                    "      for _, region in pairs(auraClones or {}) do AddRegion(id, region, true) end",
+                    "    end",
+                    "    return result",
+                    "  end",
+                    "  local animationSnapshot",
+                    "  if type(WeakAuras.GetRaidOptimizerAnimationSnapshot) == \"function\" then",
+                    "    local ok, value = pcall(WeakAuras.GetRaidOptimizerAnimationSnapshot)",
+                    "    if ok and type(value) == \"table\" then animationSnapshot = value end",
+                    "  end",
+                    "  local cleuStats = RaidOptimizerHubWeakAurasCleuDispatchStats or {}",
+                    "  local privateCleuStats = RaidOptimizerHubWeakAurasPrivateCleuStats or {}",
+                    "  return {",
+                    "    animationSnapshot = animationSnapshot,",
+                    "    regionSnapshot = CaptureRegionWork(),",
+                    "    knownCustomCleuRejects = tonumber(",
+                    "      cleuStats.raidOptimizerKnownCustomCleuRejects) or 0,",
+                    "    sourcePlayerRejects = tonumber(cleuStats.sourcePlayerRejects) or 0,",
+                    "    plannedDisplays = tonumber(cleuStats.plannedDisplays) or 0,",
+                    "    nativeDisplays = tonumber(cleuStats.nativeDisplays) or 0,",
+                    "    swingTimerBindings = tonumber(privateCleuStats.swingTimerBindings) or 0,",
+                    "  }",
+                    "end",
+                    ""
+                  ]
+                ],
+                [
+                  850,
+                  850,
+                  [
+                    "    displayWork = WeakAuras.GetRaidOptimizerDisplayWorkSnapshot(),"
+                  ]
+                ],
+                [
+                  851,
+                  852,
+                  [
+                    "      patch = \"RaidOptimizerHub integration patch v20\","
+                  ]
+                ],
+                [
+                  856,
+                  856,
+                  [
+                    "      protectedLayoutTimer = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedLayoutTimer == false),",
+                    "      layoutTimerDeferred = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.deferred) or 0,",
+                    "      layoutTimerReplayed = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.replayed) or 0,",
+                    "      layoutTimerFallback = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.fallback) or 0,",
+                    "      layoutTimerDropped = tonumber(RaidOptimizerHubWeakAurasLayoutTimerStats and RaidOptimizerHubWeakAurasLayoutTimerStats.dropped) or 0,",
+                    "      protectedCustomGrowLayout = not (RaidOptimizerHubDB and RaidOptimizerHubDB.waProtectedCustomGrowLayout == false),",
+                    "      customGrowLayoutDeferred = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.deferred) or 0,",
+                    "      customGrowLayoutCoalesced = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.coalesced) or 0,",
+                    "      customGrowLayoutReplayed = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.replayed) or 0,",
+                    "      customGrowLayoutDropped = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.dropped) or 0,",
+                    "      customGrowLayoutErrors = tonumber(RaidOptimizerHubWeakAurasCustomGrowLayoutStats and RaidOptimizerHubWeakAurasCustomGrowLayoutStats.errors) or 0,",
+                    "      legacyAuraDelta = RaidOptimizerHubDB and RaidOptimizerHubDB.waLegacyAuraDelta == true or false,"
+                  ]
+                ]
+              ],
+              "source_sha256": "a669145e276d53550441531d835dff6a1922656e8d7add8553e62e6ec6e0ee4d",
+              "trailing_newline": true
+            }
+          ]
+        },
+        {
+          "approved_sha256": "17f4be5d1546acc3e410de9917cf5e1d6e1329ba09843d813e9422f0cf551fa6",
+          "base_approved_sha256": "722fd4afaee973152bf36105a86c149903071ea08db1d7517b50d96655616378",
+          "clean_sha256": "51821023b006cc4df21dda7d3c1616a3701d0f3974faf10f40d8503e74230a53",
+          "newline_mode": "lf",
+          "ops": [
+            [
+              0,
+              0,
+              [
+                "-- RaidOptimizerHub integration patch v20"
+              ]
+            ],
+            [
+              318,
+              318,
+              [
+                "    -- RaidOptimizerHub cached static progress text",
+                "    local raidOptimizerStaticProgressTriggers = {}",
+                "    local raidOptimizerCanCacheStaticProgress = not parent.customTextFunc",
+                "      and not Private.AnyEveryFrameFormatters(",
+                "        region.text_text, region.everyFrameFormatters)",
+                "    if raidOptimizerCanCacheStaticProgress then",
+                "      local triggerCount = 0",
+                "      for _, triggerData in ipairs(parentData.triggers or {}) do",
+                "        triggerCount = triggerCount + 1",
+                "        local trigger = type(triggerData) == \"table\" and triggerData.trigger",
+                "        if type(trigger) ~= \"table\" or trigger.type == \"custom\" then",
+                "          raidOptimizerCanCacheStaticProgress = false",
+                "          break",
+                "        end",
+                "      end",
+                "      if triggerCount == 0 then",
+                "        raidOptimizerCanCacheStaticProgress = false",
+                "      end",
+                "    end",
+                "    if raidOptimizerCanCacheStaticProgress then",
+                "      Private.ParseTextStr(region.text_text, function(symbol)",
+                "        local triggerNum, sym = string.match(symbol, \"(.+)%.(.+)\")",
+                "        triggerNum = triggerNum and tonumber(triggerNum)",
+                "        sym = sym or symbol",
+                "        if sym == \"p\" then",
+                "          tinsert(raidOptimizerStaticProgressTriggers, triggerNum or 0)",
+                "        end",
+                "      end)",
+                "      if #raidOptimizerStaticProgressTriggers == 0 then",
+                "        raidOptimizerCanCacheStaticProgress = false",
+                "      end",
+                "    end",
+                "",
+                "    local raidOptimizerCachedStaticProgressText",
+                "    local raidOptimizerCachedStaticProgressValid = false",
+                "    local function RaidOptimizerCanReuseStaticProgressText()",
+                "      if not raidOptimizerCanCacheStaticProgress then return false end",
+                "      for _, triggerNum in ipairs(raidOptimizerStaticProgressTriggers) do",
+                "        local state = triggerNum == 0 and parent.state",
+                "          or parent.states and parent.states[triggerNum]",
+                "        if type(state) ~= \"table\" or state.progressType ~= \"static\" then",
+                "          return false",
+                "        end",
+                "      end",
+                "      return true",
+                "    end",
+                ""
+              ]
+            ],
+            [
+              320,
+              323,
+              [
+                "      UpdateText = function(allowStaticReuse)",
+                "        local canReuseStatic = RaidOptimizerCanReuseStaticProgressText()",
+                "        local textStr",
+                "        if allowStaticReuse and canReuseStatic",
+                "          and raidOptimizerCachedStaticProgressValid",
+                "        then",
+                "          textStr = raidOptimizerCachedStaticProgressText",
+                "        else",
+                "          textStr = region.text_text or \"\"",
+                "          textStr = Private.ReplacePlaceHolders(",
+                "            textStr, parent, nil, false, self.subTextFormatters)",
+                "          if canReuseStatic then",
+                "            raidOptimizerCachedStaticProgressText = textStr",
+                "            raidOptimizerCachedStaticProgressValid = true",
+                "          else",
+                "            raidOptimizerCachedStaticProgressValid = false",
+                "          end",
+                "        end"
+              ]
+            ],
+            [
+              339,
+              340,
+              [
+                "        UpdateText(false)"
+              ]
+            ],
+            [
+              342,
+              343,
+              [
+                "      Update = function() UpdateText(false) end"
+              ]
+            ],
+            [
+              349,
+              350,
+              [
+                "      FrameTick = function() UpdateText(true) end"
+              ]
+            ]
+          ],
+          "path": "SubRegionTypes/SubText.lua",
+          "post_newline_mode": "lf",
+          "post_ops": [
+            [
+              405,
+              406,
+              [
+                "      if UpdateText then",
+                "        Update = function() UpdateText(false) end",
+                "      end"
+              ]
+            ]
+          ],
+          "post_trailing_newline": true,
+          "trailing_newline": true,
+          "trusted_lineage_sha256s": []
+        }
+      ]
+    }
+  },
+  "release_id": "hub-0.5.49-native-guard",
+  "schema": 2
+}

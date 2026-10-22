@@ -1,0 +1,8 @@
+## Interface: 38002
+## Title: Raid Optimizer Nameplate Aura Guard
+## Notes: Disables redundant Blizzard nameplate aura lists while GF_Nameplates supplies its own auras.
+## Author: Raid Optimizer
+## Version: 0.1.0
+## Dependencies: GF_Nameplates
+## SavedVariables: RaidOptimizerNameplateAuraGuardDB
+RaidOptimizerNameplateAuraGuard.lua

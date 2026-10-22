@@ -1,0 +1,8 @@
+## Interface: 38001
+## Title: Raid Optimizer Bare Recorder
+## Notes: Silent frame-time baseline recorder. No combat-log or unit-data processing.
+## Author: Raid Optimizer
+## Version: 0.1.0
+## SavedVariables: RaidOptimizerBareRecorderDB
+
+RaidOptimizerBareRecorder.lua

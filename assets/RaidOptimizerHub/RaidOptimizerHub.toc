@@ -1,0 +1,12 @@
+## Interface: 38001
+## Title: 团本优化大师 数据中枢
+## Notes: Shared data and native-safe compatibility layer for supported addons.
+## Author: Raid Optimizer
+## Version: 0.5.49
+## SavedVariables: RaidOptimizerHubDB
+install_stamp.lua
+runtime_config.lua
+RaidOptimizerHub.lua
+UnitDataProvider.lua
+FrameProvider.lua
+ElvUIBridge.lua
