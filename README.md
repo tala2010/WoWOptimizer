@@ -4,11 +4,13 @@
 
 **免费使用，无激活码、无到期限制、无授权服务器、无自动下载。尚未证明能普遍提升 FPS，更不承诺提升 10%。**
 
-## 直接下载使用（不用编译）
+## 免费下载，解压即可使用（不用编译）
 
 **[下载 Windows 64 位免费预览版 ZIP](https://github.com/tala2010/WoWOptimizer/releases/download/v0.1.0-preview/WoWOptimizer-Windows-x64-0.1.0-preview.zip)** · [查看发布说明](https://github.com/tala2010/WoWOptimizer/releases/tag/v0.1.0-preview)
 
 下载 ZIP 后全部解压，双击其中的 `WoWOptimizer.exe`。不需要安装 Python，也不需要激活或连接作者服务器。选择游戏目录、关闭游戏，再按界面提示优化；修改系统设置时会请求管理员权限。
+
+这个公开版的源码和 EXE 均免费提供，无需购买。我们希望让不懂代码的玩家也能直接试用，让愿意研究的朋友能查看原理、复现结果并参与改进。
 
 这是解压即用的社区预览包，没有单独的安装向导。适用于 Windows 10/11 64 位；已在开发机检查启动，尚未完成干净电脑和新免费组合的游戏实测。请先阅读包内中文说明，保留备份；遇到问题可用“恢复设置”并到 Issues 反馈。
 
@@ -48,7 +50,17 @@ python -m venv .venv
 
 以上是特定历史环境的非随机实战观察，不是本免费版的效果验证，也不能归因成每项功能各自的收益。详情与限制见 [真实效果](docs/RESULTS.md)。
 
-## 原理与参与方式
+## 交流、反馈与一起完善
+
+欢迎玩家试用，也欢迎懂 Python、Lua、魔兽插件或性能分析的朋友一起完善。有效、无效、变慢、报错，都值得记录；我们希望留下可验证的结果，而不是只收集好评。
+
+- **问题反馈、使用交流和建议：[进入 GitHub Issues](https://github.com/tala2010/WoWOptimizer/issues)。** 请尽量说明电脑配置、游戏版本、插件环境、操作步骤和实际表现。
+- **Telegram：[t.me/beita2008](https://t.me/beita2008)**
+- **微信：`talaliu2010`**（添加时请备注“魔兽优化交流”）。欢迎交流使用体验、优化思路和共同开发。
+- **参与开发：** 可以先提 Issue 讨论，也可以按 [贡献指南](CONTRIBUTING.md) 提交 Pull Request。尚未解决的方向见 [待解决问题](docs/ROADMAP.md)。
+- 上传截图、日志或配置前，请遮住账号、角色、聊天内容和其他个人信息；请勿公开提交密钥或完整私人配置。
+
+## 原理与项目资料
 
 - [架构与原理](docs/ARCHITECTURE.md)
 - [公开范围与第三方说明](THIRD_PARTY_NOTICES.md)
