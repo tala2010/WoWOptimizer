@@ -1,5 +1,9 @@
 # 使用说明
 
+普通玩家请直接下载 [Windows 64 位免费预览包](https://github.com/tala2010/WoWOptimizer/releases/download/v0.1.0-preview/WoWOptimizer-Windows-x64-0.1.0-preview.zip)，全部解压后双击 `WoWOptimizer.exe`。无需 Python、编译、激活或连接作者服务器。它是便携版，不需要安装向导；不要在压缩包预览窗口中直接运行。
+
+源码开发者的 Python 运行方式见 README。以下操作同时适用于 EXE 和源码运行。
+
 1. 关闭游戏。先自行备份 `WTF/Config.wtf` 和 `Interface/AddOns`；不要将完整个人备份发到 Issues。
 2. 启动程序，选择正确的游戏目录和客户端。多个客户端必须明确选择。
 3. 先查看日志和确认窗口，再执行一键优化。需要写系统设置时按提示以管理员身份重启。
